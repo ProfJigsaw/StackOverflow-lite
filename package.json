@@ -27,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/ProfJigsaw/StackOverflow-lite/issues"
   },
-  "homepage": "https://github.com/ProfJigsaw/StackOverflow-lite#readme"
+  "homepage": "https://github.com/ProfJigsaw/StackOverflow-lite#readme",
+  "dependencies": {
+    "eslint": "^5.3.0"
+  }
 }
