@@ -29,7 +29,8 @@
   },
   "homepage": "https://github.com/ProfJigsaw/StackOverflow-lite#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "gemfile": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
