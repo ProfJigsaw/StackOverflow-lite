@@ -1,0 +1,11 @@
+{>"layout" /}
+{<body}
+    {# error }
+        <h3 id="main-header">Oops! {errorType}</h3>
+        <p>
+        	We are terribly sorry!<br>
+        	<strong id="error">[[ {errorMsg} ]]</strong>
+        </p>
+    {/ error}
+    <br />
+{/body}

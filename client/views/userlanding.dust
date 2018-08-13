@@ -1,0 +1,14 @@
+{>"userlayout" /}
+
+{<body}
+    <h1>Hello, <span id="hello">{msg.user}</span>!</h1>
+    <h2 id="main-header"> Welcome to, StackOverFlow Lite</h2>
+    <br />
+    <h3>
+        STACK TIP    
+    </h3>
+    <i>
+        This is a platform for asking useful questions on any aspect of life and getting feedback from others on the platform.
+        <p> See recently asked questions,by following the link provided on the left hand of this page.</p>
+    </i>
+{/body}

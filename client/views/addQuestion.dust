@@ -1,0 +1,16 @@
+{>"userlayout" /}
+{<body}
+	<div id="add-question">
+		<h3 id="loginformheader">User Dialog: Add question</h3>
+		<form action="/api/v1/questions" method="post">
+			<label>Ask Your Question:
+				<br>
+				<textarea type="text" name="question" id="form-question-input"required></textarea>
+			</label>
+			<input type="hidden" name="userId" class="secret-userId" value="" />
+			<input type="hidden" name="username" class="secret-username" value="" />
+			<br>
+			<input type="submit" value="Add question" name="submit" class="submit" />
+		</form>
+	</div>	
+{/body}

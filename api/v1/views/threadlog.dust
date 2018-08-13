@@ -1,0 +1,60 @@
+{>"threadloglayout" /}
+{<body}
+        {# questions}
+            <div id="questions">
+                <p><strong>#Q_ID:{questionId}-</strong></p>
+                <p><strong>{username}</strong> asked</p>
+                <h3>{question}</h3>
+                <form method="post" action="/api/v1/questions/{questionId}/delete">
+                    <input class="secret-userId" type="hidden" name="userId" value="" />
+                    <strong>
+                        <input type="submit" value="Delete this question"/>
+                    </strong>
+                </form>
+            </div>
+            {#answers}
+                <div class="answers {acceptState}">
+                    <strong id="username">{username}</strong> answered:<p> {answer}
+                    <form method="post" action="/api/v1/questions/{questionId}/{answerId}/accept">
+                        <input class="secret-userId" type="hidden" name="userId" value="" />
+                        <strong>
+                            <input type="submit" value="Accept this answer"/>
+                        </strong>
+                    </form>
+                    <div class="votes">
+                        <a href="/api/v1/questions/{questionId}/{answerId}/vote">UpVote</a>
+                        <span>{votes}</span>
+                        <a href="/api/v1/questions/downvote/{questionId}/{answerId}">DownVote</a>
+                    </div>
+                </div>
+                {#comments}
+                    <div class="comments">
+                        {username} commented: {comment}
+                    </div>
+                {/comments}
+                
+                <div id="comment-form">
+            <form action="/api/v1/questions/addcomment/{questionId}/{answerId}" method="post">
+
+                <input type="hidden" name="userId" class="secret-userId" value="" />
+                <input type="hidden" name="username" class="secret-username" value="" />
+
+                <textarea name="comment" type="text" class="comment-part" required></textarea/><br>
+                <input class="comment-part" type="submit" value="Post Comment"/>
+            </form>
+                </div>
+            {/answers}
+        {/questions}
+    <br/>
+    <div id="add-answer">
+        <form method="post" action="/api/v1/questions/{questions.questionId}/answers">
+
+            <input type="hidden" name="userId" class="secret-userId" value="" />
+            <input type="hidden" name="username" class="secret-username" value="" />
+
+            <textarea type="text" name="answer" id="form-answer-input" required></textarea>
+            <br>
+            <input type="submit" value="Add answer" id="add-answer" name="submit" />
+        </form>
+    </div>
+{/body}
