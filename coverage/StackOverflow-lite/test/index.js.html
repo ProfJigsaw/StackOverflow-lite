@@ -22,7 +22,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>47/47</span>
+        <span class='fraction'>45/45</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -32,12 +32,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>25/25</span>
+        <span class='fraction'>24/24</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>47/47</span>
+        <span class='fraction'>45/45</span>
       </div>
     </div>
     <p class="quiet">
@@ -211,14 +211,7 @@
 <a name='L163'></a><a href='#L163'>163</a>
 <a name='L164'></a><a href='#L164'>164</a>
 <a name='L165'></a><a href='#L165'>165</a>
-<a name='L166'></a><a href='#L166'>166</a>
-<a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a>
-<a name='L169'></a><a href='#L169'>169</a>
-<a name='L170'></a><a href='#L170'>170</a>
-<a name='L171'></a><a href='#L171'>171</a>
-<a name='L172'></a><a href='#L172'>172</a>
-<a name='L173'></a><a href='#L173'>173</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L166'></a><a href='#L166'>166</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,13 +316,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -401,7 +387,7 @@ import getUserEmail from '../api/v1/helpers/getUserEmail';
 &nbsp;
 const { expect } = chai;
 &nbsp;
-describe('Helper function tests', () =&gt; {
+describe('HELPER FUNCTION TESTS:', () =&gt; {
   it('Mode should return the number with greatest frequency', () =&gt; {
     expect(mode([1, 1, 1, 1, 2, 3, 4, 1, 1, 1, 3])).to.equal(1);
   });
@@ -450,7 +436,7 @@ describe('Helper function tests', () =&gt; {
 });
 &nbsp;
 describe('ENDPOINT TESTS', () =&gt; {
-  it('it should get the total questions', (done) =&gt; {
+  it('it should get all questions successfully', (done) =&gt; {
     request(server)
     .get('/questions')
     .expect(200)
@@ -462,7 +448,7 @@ describe('ENDPOINT TESTS', () =&gt; {
     .expect(200)
     .end(done);
   });
-  it('it should post a question successfully, redirect successfully', (done) =&gt; {
+  it('it should post a question successfully', (done) =&gt; {
     request(server)
     .post('/questions')
     .send({
@@ -473,7 +459,7 @@ describe('ENDPOINT TESTS', () =&gt; {
     .expect(200)
     .end(done);
   });
-  it('it should post answer successfully, and redirect successfully', (done) =&gt; {
+  it('it should post answer successfully', (done) =&gt; {
     request(server)
     .post('/questions/1/answers')
     .send({
@@ -487,7 +473,7 @@ describe('ENDPOINT TESTS', () =&gt; {
 });
 &nbsp;
 describe('API URL VERSION 1 TEST:', () =&gt; {
-  it('it should hit the client homepage', (done) =&gt; {
+  it('it should hit the homepage successfully', (done) =&gt; {
     request(server)
     .get('/')
     .expect(200)
@@ -499,23 +485,16 @@ describe('API URL VERSION 1 TEST:', () =&gt; {
     .expect(404)
     .end(done);
   });
-  it('it should redirect with status 302, to the location: /api/v1/user,', (done) =&gt; {
-    request(server)
-    .get('/api/v1')
-    .expect('Location', /\/user/)
-    .expect(302)
-    .end(done);
-  });
   it('it should not be found, v2 doesnt exist', (done) =&gt; {
     request(server)
     .get('/api/v2')
     .expect(404)
     .end(done);
   });
-  it('it should load the user homepage successfully', (done) =&gt; {
+  it('it should throw an internal server error 500', (done) =&gt; {
     request(server)
     .get('/api/v1/user')
-    .expect(200)
+    .expect(500)
     .end(done);
   });
 });
@@ -536,10 +515,10 @@ describe('API URL VERSION 1 Endpoints TESTS', () =&gt; {
   it('it should should throw an http 404 error when requesting non existent thread', (done) =&gt; {
     request(server)
     .get('/api/v1/questions/questionThread/1222')
-    .expect(404)
+    .expect(/not found/)
     .end(done);
   });
-  it('it should post a question successfully, redirect successfully', (done) =&gt; {
+  it('it should post a question successfully', (done) =&gt; {
     request(server)
     .post('/api/v1/questions')
     .send({
@@ -547,10 +526,10 @@ describe('API URL VERSION 1 Endpoints TESTS', () =&gt; {
       userId: 3,
       question: 'what is life?',
     })
-    .expect(302)
+    .expect(200)
     .end(done);
   });
-  it('it should post answer successfully, and redirect successfully', (done) =&gt; {
+  it('it should post answer successfully', (done) =&gt; {
     request(server)
     .post('/api/v1/questions/1/answers')
     .send({
@@ -558,7 +537,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () =&gt; {
       userId: 2,
       answer: 'life is mysterious',
     })
-    .expect(302)
+    .expect(200)
     .end(done);
   });
 });
@@ -568,7 +547,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () =&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Aug 14 2018 19:04:37 GMT+0100 (W. Central Africa Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed Aug 15 2018 00:11:35 GMT+0100 (W. Central Africa Standard Time)
 </div>
 </div>
 <script src="..\..\prettify.js"></script>

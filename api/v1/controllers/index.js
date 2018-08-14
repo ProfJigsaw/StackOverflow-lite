@@ -3,7 +3,7 @@ import express from 'express';
 const router = express.Router();
 
 router.get('/', (req, res) => {
-  res.redirect('/api/v1/user');
+  res.send('welcome to StackOverflow-Lite');
 });
 
 export default router;

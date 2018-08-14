@@ -7,34 +7,20 @@ const router = express.Router();
 let { questions, answers } = dbpackage;
 
 router.get('/', (req, res) => {
-  res.render('questionsLog', {
-    questions,
-  });
+  res.json(questions);
 });
 
 router.post('/error', (req, res) => {
-  res.render('error', {
-    error: {
-      errorMsg: 'Please log In or create an account to enable searching.',
-      errorType: 'Not Logged In Yet',
-    },
-  });
+  res.send('Error Page!');
 });
 
 router.get('/:id', (req, res) => {
   const id = Number(req.params.id);
   const found = questions.filter(o => o.questionId === id);
   if (found.length === 1) {
-    res.render('questionsLog', {
-      questions: found[0],
-    });
+    res.json(found[0]);
   } else {
-    res.render('usererror', {
-      error: {
-        errorMsg: `Question Id: ${id} does not exit`,
-        errorType: 'Invalid Question Id',
-      },
-    });
+    res.send(`This question id [ ${id} ] doesnt exit yet, create it by posting at "/questions"`);
   }
 });
 
@@ -44,12 +30,9 @@ router.get('/questionThread/:qId', (req, res) => {
   if (found.length === 1) {
     const qId = found[0].questionId;
     const answerForQuestion = answers.filter(o => o.questionId === qId);
-    res.render('threadlog', {
-      questions: found[0],
-      answers: answerForQuestion,
-    });
+    res.json(answerForQuestion);
   } else {
-    res.status(404).send();
+    res.send('This question id was not found');
   }
 });
 
@@ -59,16 +42,9 @@ router.post('/findQuestion', (req, res) => {
     o => o.question.toLowerCase().indexOf(keyword.toLowerCase()) !== -1,
   );
   if (found.length !== 0) {
-    res.render('questionsLog', {
-      questions: found,
-    });
+    res.json(found);
   } else {
-    res.render('usererror', {
-      error: {
-        errorMsg: `${keyword} not found. Try a different keyword.`,
-        errorType: 'Keyword not found',
-      },
-    });
+    res.send('Keyword not found!');
   }
 });
 
@@ -76,16 +52,9 @@ router.post('/findQuestionById', (req, res) => {
   const qId = Number(req.body.qid);
   const found = questions.filter(question => question.questionId === qId);
   if (found.length !== 0) {
-    res.render('questionsLog', {
-      questions: found,
-    });
+    res.json(found);
   } else {
-    res.render('usererror', {
-      error: {
-        errorMsg: `${qId} not found. Try a different question Id.`,
-        errorType: 'Question Id Not Found',
-      },
-    });
+    res.send('Question id not found!');
   }
 });
 
@@ -96,7 +65,7 @@ router.post('/', (req, res) => {
     username: req.body.username,
     question: req.body.question,
   });
-  res.redirect('/api/v1/questions');
+  res.json(questions);
 });
 
 router.post('/:id/answers', (req, res) => {
@@ -112,7 +81,7 @@ router.post('/:id/answers', (req, res) => {
     votes: 0,
     comments: [],
   });
-  res.redirect(`/api/v1/questions/questionThread/${questId}`);
+  res.json(answers);
 });
 
 router.post('/:id/delete', (req, res) => {
@@ -160,14 +129,9 @@ router.post('/:qId/:aId/accept', (req, res) => {
       }
       return true;
     });
-    res.redirect(`/api/v1/questions/questionThread/${questId}`);
+    res.json(answers);
   } else {
-    res.render('usererror', {
-      error: {
-        errorMsg: 'You are not the author of this question, therefore you can\'t accept it',
-        errorType: 'Not Allowed',
-      },
-    });
+    res.send('You cant accept this, you didnt create the question');
   }
 });
 
@@ -179,7 +143,7 @@ router.get('/:qId/:aId/vote', (req, res) => {
     }
     return false;
   });
-  res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`);
+  res.json(answers);
 });
 
 router.get('/:downvote/:qId/:aId', (req, res) => {
@@ -194,15 +158,13 @@ router.get('/:downvote/:qId/:aId', (req, res) => {
     }
     return false;
   });
-  res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`);
+  res.json(answers);
 });
 
 router.get('/user/:userId', (req, res) => {
   const uId = Number(req.params.userId);
   const userQuestions = questions.filter(qtn => qtn.userId === uId);
-  res.render('questionsLog', {
-    questions: userQuestions,
-  });
+  res.json(userQuestions);
 });
 
 router.get('/questionsAnswered/:userId', (req, res) => {
@@ -224,9 +186,7 @@ router.get('/questionsAnswered/:userId', (req, res) => {
     });
     return false;
   });
-  res.render('questionsLog', {
-    questions: foundquestions,
-  });
+  res.json(foundquestions);
 });
 
 router.get('/top/question', (req, res) => {
@@ -234,9 +194,7 @@ router.get('/top/question', (req, res) => {
   answers.map(answer => ansdqtn.push(answer.questionId));
   const modeqtn = mode(ansdqtn);
   const topqtn = questions.filter(question => question.questionId === modeqtn);
-  res.render('questionsLog', {
-    questions: topqtn,
-  });
+  res.json(topqtn);
 });
 
 router.post('/addcomment/:qId/:answerId', (req, res) => {
@@ -255,7 +213,7 @@ router.post('/addcomment/:qId/:answerId', (req, res) => {
     }
     return false;
   });
-  res.redirect(`/api/v1/questions/questionThread/${questId}`);
+  res.json(answers);
 });
 
 

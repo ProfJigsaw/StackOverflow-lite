@@ -9,7 +9,7 @@ import getUserEmail from '../api/v1/helpers/getUserEmail';
 
 const { expect } = chai;
 
-describe('Helper function tests', () => {
+describe('HELPER FUNCTION TESTS:', () => {
   it('Mode should return the number with greatest frequency', () => {
     expect(mode([1, 1, 1, 1, 2, 3, 4, 1, 1, 1, 3])).to.equal(1);
   });
@@ -58,7 +58,7 @@ describe('Helper function tests', () => {
 });
 
 describe('ENDPOINT TESTS', () => {
-  it('it should get the total questions', (done) => {
+  it('it should get all questions successfully', (done) => {
     request(server)
     .get('/questions')
     .expect(200)
@@ -70,7 +70,7 @@ describe('ENDPOINT TESTS', () => {
     .expect(200)
     .end(done);
   });
-  it('it should post a question successfully, redirect successfully', (done) => {
+  it('it should post a question successfully', (done) => {
     request(server)
     .post('/questions')
     .send({
@@ -81,7 +81,7 @@ describe('ENDPOINT TESTS', () => {
     .expect(200)
     .end(done);
   });
-  it('it should post answer successfully, and redirect successfully', (done) => {
+  it('it should post answer successfully', (done) => {
     request(server)
     .post('/questions/1/answers')
     .send({
@@ -95,7 +95,7 @@ describe('ENDPOINT TESTS', () => {
 });
 
 describe('API URL VERSION 1 TEST:', () => {
-  it('it should hit the client homepage', (done) => {
+  it('it should hit the homepage successfully', (done) => {
     request(server)
     .get('/')
     .expect(200)
@@ -107,23 +107,16 @@ describe('API URL VERSION 1 TEST:', () => {
     .expect(404)
     .end(done);
   });
-  it('it should redirect with status 302, to the location: /api/v1/user,', (done) => {
-    request(server)
-    .get('/api/v1')
-    .expect('Location', /\/user/)
-    .expect(302)
-    .end(done);
-  });
   it('it should not be found, v2 doesnt exist', (done) => {
     request(server)
     .get('/api/v2')
     .expect(404)
     .end(done);
   });
-  it('it should load the user homepage successfully', (done) => {
+  it('it should throw an internal server error 500', (done) => {
     request(server)
     .get('/api/v1/user')
-    .expect(200)
+    .expect(500)
     .end(done);
   });
 });
@@ -144,10 +137,10 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
   it('it should should throw an http 404 error when requesting non existent thread', (done) => {
     request(server)
     .get('/api/v1/questions/questionThread/1222')
-    .expect(404)
+    .expect(/not found/)
     .end(done);
   });
-  it('it should post a question successfully, redirect successfully', (done) => {
+  it('it should post a question successfully', (done) => {
     request(server)
     .post('/api/v1/questions')
     .send({
@@ -155,10 +148,10 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       userId: 3,
       question: 'what is life?',
     })
-    .expect(302)
+    .expect(200)
     .end(done);
   });
-  it('it should post answer successfully, and redirect successfully', (done) => {
+  it('it should post answer successfully', (done) => {
     request(server)
     .post('/api/v1/questions/1/answers')
     .send({
@@ -166,7 +159,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       userId: 2,
       answer: 'life is mysterious',
     })
-    .expect(302)
+    .expect(200)
     .end(done);
   });
 });
