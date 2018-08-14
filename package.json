@@ -6,7 +6,6 @@
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register --exit",
     "build": "rm -rf ./build && babel --watch ./ --out-dir build/",
-    "prepublish": "rm -rf ./build && babel ./ --out-dir build/",
     "coveralls": "NODE_ENV=test nyc npm test && nyc report --reporter=lcov --reporter=text --reporter=lcovonly || coveralls",
     "start": "nodemon app.js --exec babel-node --presets babel-preset-es2015"
   },
