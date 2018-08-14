@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/ProfJigsaw/StackOverflow-lite.svg?branch=feature)](https://travis-ci.org/ProfJigsaw/StackOverflow-lite)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f7236c27c148d101bf35/maintainability)](https://codeclimate.com/github/ProfJigsaw/StackOverflow-lite/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f7236c27c148d101bf35/test_coverage)](https://codeclimate.com/github/ProfJigsaw/StackOverflow-lite/test_coverage)
-[![Coverage Status](https://coveralls.io/repos/github/ProfJigsaw/StackOverflow-lite/badge.svg?branch=master)](https://coveralls.io/github/ProfJigsaw/StackOverflow-lite?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/ProfJigsaw/StackOverflow-lite/badge.svg?branch=feature)](https://coveralls.io/github/ProfJigsaw/StackOverflow-lite?branch=master)
 
 # StackOverflow-lite
 This web application is a `lite` weight version the popular [StackExchange](https://stackexchange.com) branch of the same name. It uses the popular JavaScript runtime environment, `NodeJs` and runs `express` at the backend.
