@@ -22,9 +22,5 @@ app.use(expressApiVersioning({
   next();
 }));
 
-app.get('/', (req, res) => {
-  res.send('Hello You are all set');
-});
-
 app.listen(process.env.PORT || 3000);
 export default app;

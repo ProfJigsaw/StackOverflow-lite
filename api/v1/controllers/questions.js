@@ -22,7 +22,7 @@ router.post('/error', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
   const found = questions.filter(o => o.questionId === id);
   if (found.length === 1) {
     res.render('questionsLog', {
@@ -73,7 +73,7 @@ router.post('/findQuestion', (req, res) => {
 });
 
 router.post('/findQuestionById', (req, res) => {
-  const qId = req.body.qid;
+  const qId = Number(req.body.qid);
   const found = questions.filter(question => question.questionId === qId);
   if (found.length !== 0) {
     res.render('questionsLog', {

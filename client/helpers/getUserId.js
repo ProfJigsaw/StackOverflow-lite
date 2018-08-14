@@ -1,7 +1,8 @@
-export default (users, username) => {
-	let id = 0;
-	users.map(obj=>{
-		id = (obj.username == username) ? obj.userId : id;
-	});
-	return id;
-}
+export default (arrayOfObjects, key) => {
+  let max = 0;
+  arrayOfObjects.map((obj) => {
+    max = (obj[key] > max) ? obj[key] : max;
+    return false;
+  });
+  return max + 1;
+};

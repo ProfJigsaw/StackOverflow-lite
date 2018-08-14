@@ -1,314 +1,220 @@
 import express from 'express';
 import dbpackage from '../model/dbstruct';
-import getUser from '../helpers/getSessionUser';
 import generateUniqueId from '../helpers/genUniqueId';
 import mode from '../helpers/mode';
-const router = express.Router();
 
-/*
-	DESTRUCTURING AND SETTING THE INITIAL STATE OF 
-	QUESTIONS AND ANSWERS USING THE SUGAR FLAVOURED ES6 SYNTAX
-*/
+const router = express.Router();
 let { questions, answers } = dbpackage;
 
-/*
-	ROUTE TO HANDLE THE PAGE THE USER SEES WHEN THEY REQUEST
-	ALL THE QUESTIONS THAT HAS BEEN POSTED ON THE PLATFORM.
-*/
-router.get('/', (req, res)=>{
-	res.render('questionsLog', {
-		questions
-	});
+router.get('/', (req, res) => {
+  res.json(questions);
 });
 
-/*
-	ROUTE TO HANDLE UNAUTHORIZED ATTEMPT TO SEARCH FOR QUESTIONS 
-	ON THE PLATFORM WITH CREATING AN ACCOUNT OR LOGGING IN
-*/
-router.post('/error', (req, res)=>{
-	res.render('error', {
-		error: {
-			errorMsg: 'Please log In or create an account to enable searching.',
-			errorType: "Not Logged In Yet" 
-		}
-	})
-})
-
-/*
-	ROUTE TO OBTAIN A PARTICULAR QUESTION POSTED 
-	BASED ON THE ID PROVIDED BY THE USER.
-*/
-router.get('/:id', (req, res)=>{
-	let id = req.params.id;
-	let found = questions.filter(o=>o.questionId == id);
-	if(found.length === 1){
-		let qId = found[0].questionId;
-		let answerForQuestion = answers.filter(o=>o.questionId === qId);
-		res.render('questionsLog', {
-			questions: found[0]
-		});
-	}else{
-		res.render('usererror', {
-			error: {
-				errorMsg: `Question Id: ${id} does not exit`,
-				errorType: "Invalid Question Id"
-			}
-		});
-	}
+router.post('/error', (req, res) => {
+  res.render('error', {
+    error: {
+      errorMsg: 'Please log In or create an account to enable searching.',
+      errorType: 'Not Logged In Yet',
+    },
+  });
 });
 
-/*
-	HANDLING THE REQUEST TO VIEW A QUESTION THREAD
-*/
-router.get('/questionThread/:qId', (req, res)=>{
-	let id = req.params.qId;
-	let found = questions.filter(o=>o.questionId == id);
-	if(found.length === 1){
-		let qId = found[0].questionId;
-		let answerForQuestion = answers.filter(o=>o.questionId === qId);
-		res.render('threadlog', {
-			questions: found[0],
-			answers: answerForQuestion
-		});
-	}else{
-		res.status(404).send();
-	}
+router.get('/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const found = questions.filter(o => o.questionId === id);
+  if (found.length === 1) {
+    res.json(found[0]);
+  } else {
+    res.send(`This question id [ ${id} ] doesnt exit yet, create it by posting at "/questions"`);
+  }
 });
 
-/*
-	ROUTE TO HANDLE A SEARCH BY A LOGGED IN USER
-*/
-router.post('/findQuestion', (req, res)=>{
-	let keyword = req.body.keyword;
-	let found = questions.filter(o=>o.question.toLowerCase().indexOf(keyword.toLowerCase()) != -1);
-	if(found.length != 0){
-		res.render('questionsLog', {
-			questions: found
-		});
-	}else{
-		res.render('usererror', {
-			error: {
-				errorMsg: `${keyword} not found. Try a different keyword.`,
-				errorType: "Keyword not found"
-			}
-		})
-	}
-})
- 
-/*
-	FIND A GIVEN QUESTION BY THE ID PROVIDED
-*/
-router.post('/findQuestionById', (req, res)=>{
-	let qId = req.body.qid;
-	let found = questions.filter(question=>question.questionId == qId);
-	if(found.length != 0){
-		res.render('questionsLog', {
-			questions: found
-		});
-	}else{
-		res.render('usererror', {
-			error: {
-				errorMsg: `${qId} not found. Try a different question Id.`,
-				errorType: "Question Id Not Found"
-			}
-		})
-	}
+router.get('/questionThread/:qId', (req, res) => {
+  const id = Number(req.params.qId);
+  const found = questions.filter(o => o.questionId === id);
+  if (found.length === 1) {
+    const qId = found[0].questionId;
+    const answerForQuestion = answers.filter(o => o.questionId === qId);
+    res.json(answerForQuestion);
+  } else {
+    res.send('This thread does not exist');
+  }
 });
 
-/*
-	THIS ROUTE RECEIVES AND ADDS A NEW QUESTION
-*/
-router.post('/', (req, res)=>{
-	questions.unshift({
-		questionId: Number(generateUniqueId(questions, "questionId")),
-		userId: Number(req.body.userId),
-		username: req.body.username,
-		question: req.body.question
-	});
-	res.redirect('/api/v1/questions');
+router.post('/findQuestion', (req, res) => {
+  const { keyword } = req.body;
+  const found = questions.filter(
+    o => o.question.toLowerCase().indexOf(keyword.toLowerCase()) !== -1,
+  );
+  if (found.length !== 0) {
+    res.json(found);
+  } else {
+    res.send('Keyword not found on the platform');
+  }
 });
 
-/*
-	ROUTE TO HANDLE THE ANSWER ENTERED BY A USER
-*/
-router.post('/:id/answers', (req, res)=>{
-	let questId = req.params.id;
-	let entPut = req.body.answer;
-	answers.push({
-		answerId: generateUniqueId(answers, "answerId"),
-		questionId : Number(questId),
-		userId : req.body.userId,
-		username: req.body.username,
-		answer : entPut,
-		answerState: "",
-		votes: 0,
-		comments: []
-	});
-	res.redirect(`/api/v1/questions/questionThread/${questId}`);
+router.post('/findQuestionById', (req, res) => {
+  const qId = req.body.qid;
+  const found = questions.filter(question => question.questionId === qId);
+  if (found.length !== 0) {
+    res.json(found);
+  } else {
+    res.send('This question id does not exist!');
+  }
 });
 
-/*
-	ROUTE TO HANDLE A DELETE REQUEST FOR A PARTICULAR 
-	QUESTION FROM THE CERTIFIED USER. IT DOES THIS IN 
-	A SERIES OF STEPS:
-	1. VALIDATE THE USER, SO ONLY THE USER WHO CREATED THE
-	QUESTION IN QUESTION (lol :-), pun intended ) CAN DELETE IT.
-	2. FILTER THE QUESTIONS AND LEAVE OUT THE QUESTION TO BE DELETED
-*/
-router.post('/:id/delete', (req, res)=>{
-	let questId = req.params.id;
-	let userId = req.body.userId;
-	let goAhead = false;
-	questions.map(question=>{
-		if(question.questionId == questId && question.userId == userId)
-			goAhead = true;
-	})
-	if(goAhead == true){
-		questions = questions.filter(question=>question.questionId != questId);
-		answers = answers.filter(answer=>answer.questionId != questId);
-		res.redirect(`/api/v1/questions`);
-	}else{
-		res.render('usererror', {
-			error: {
-				errorMsg: 'You are not the author of this question, therefore you cant delete it',
-				errorType: 'Delete Not Allowed'
-			}
-		})
-	}
-	
+router.post('/', (req, res) => {
+  questions.unshift({
+    questionId: Number(generateUniqueId(questions, 'questionId')),
+    userId: Number(req.body.userId),
+    username: req.body.username,
+    question: req.body.question,
+  });
+  res.json(questions);
 });
 
-/*
-	THIS ROUTE VALIDATES A USER WHO ISSUED AN ACCEPT ANSWER REQUEST
-	AND CREATES AND ACCEPT-STATE BY ADDING AN ACCEPT CLASS WHICH 
-	ADDS A GREEN BORDER TO THE ACCEPTED ANSWER.
-*/
-router.post('/:qId/:aId/accept', (req, res)=>{
-	let questId = req.params.qId;
-	let answerId = req.params.aId;
-	let userId = req.body.userId;
-	let goAhead = false;
-	questions.map(question=>{
-		if(question.questionId == questId && question.userId == userId)
-			goAhead = true;
-	})
-	if(goAhead == true){
-		answers.map(answer=>{
-			if(answer.answerId == answerId){
-				answer.acceptState = "accepted";
-			}else{
-				answer.acceptState = "";
-			}
-		});
-		res.redirect(`/api/v1/questions/questionThread/${questId}`)
-	}else{
-		res.render('usererror', {
-			error: {
-				errorMsg: 'You are not the author of this question, therefore you can\'t accept it',
-				errorType: 'Not Allowed'
-			}
-		})
-	}
+router.post('/:id/answers', (req, res) => {
+  const questId = Number(req.params.id);
+  const entPut = req.body.answer;
+  answers.push({
+    answerId: generateUniqueId(answers, 'answerId'),
+    questionId: Number(questId),
+    userId: Number(req.body.userId),
+    username: req.body.username,
+    answer: entPut,
+    answerState: '',
+    votes: 0,
+    comments: [],
+  });
+  res.json(answers);
 });
 
-/*
-	ROUTE TO HANDLE A VOTE UP REQUEST ON A PARTICULAR QUESTION
-*/
-router.get('/:qId/:aId/vote',(req, res)=>{
-	answers.map(answer=>{
-		if(answer.questionId == req.params.qId && answer.answerId == req.params.aId){
-				answer.votes = answer.votes + 1;
-		}
-	});
-	res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`)
+router.post('/:id/delete', (req, res) => {
+  const questId = Number(req.params.id);
+  const { userId } = req.body;
+  let goAhead = false;
+  questions.map((question) => {
+    if (question.questionId === questId && question.userId === Number(userId)) {
+      goAhead = true;
+    }
+    return true;
+  });
+  if (goAhead === true) {
+    questions = questions.filter(question => question.questionId !== questId);
+    answers = answers.filter(answer => answer.questionId !== questId);
+    res.send('Question deleted successfully');
+  } else {
+    res.send('You cant delete this question, you didnt create it!');
+  }
 });
 
-/*
-	ROUTE TO HANDLE A VOTE DOWN REQUEST OF A PARTICULAR QUESTION,
-	THIS ROUTE WILL NOT DO ANYTHING IF THE ANSWER VOTES ARE ALREADY AT ZERO
-*/
-router.get('/:downvote/:qId/:aId', (req, res)=>{
-	answers.map(answer=>{
-		if(answer.questionId == req.params.qId && answer.answerId == req.params.aId){
-			if(answer.votes > 0){
-				answer.votes = answer.votes - 1;
-			}else{
-				answer.votes = answer.votes;
-			}
-		}
-	})
-	res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`)
-})
-
-/*
-	ROUTE TO HANDLE REQUEST BY A USER TO SEE ALL THE
-	QUESTIONS THAT THEY EVER POSTED ON THE PLATFOROM
-*/
-router.get('/user/:userId',(req, res)=>{
-	let uId = req.params.userId;
-	let userQuestions = questions.filter(qtn=>qtn.userId == uId);
-	res.render('questionsLog', {
-		questions: userQuestions
-	});
+router.post('/:qId/:aId/accept', (req, res) => {
+  const questId = Number(req.params.qId);
+  const answerId = Number(req.params.aId);
+  const uId = req.body.userId;
+  let goAhead = false;
+  questions.map((question) => {
+    if (question.questionId === questId && question.userId === Number(uId)) {
+      goAhead = true;
+    }
+    return true;
+  });
+  /* eslint-disable no-param-reassign */
+  if (goAhead === true) {
+    answers.map((ans) => {
+      if (ans.answerId === answerId) {
+        ans.acceptState = 'accepted';
+      } else {
+        ans.acceptState = '';
+      }
+      return true;
+    });
+    res.send('Answer accepted');
+  } else {
+    res.send('You cannot accept this answer, you didnt ask the question!');
+  }
 });
 
-/*
-	ROUTE TO HANDLE REQUEST BY A USER TO SEE ALL THE 
-	QUESTION THEY HAVE EVER GIVEN A RESPONSE TO.
-*/
-router.get('/questionsAnswered/:userId',(req, res)=>{
-	let uId = req.params.userId;
-	let qansd = [];
-	answers.map(ans=>{
-		if(ans.userId == uId)
-			qansd.push(ans.questionId)
-	});
-	let foundquestions = [];
-	qansd.map(id=>{
-		questions.map(question=>{
-			if(question.questionId == id)
-				foundquestions.push(question);
-		});
-	});
-	res.render('questionsLog', {
-		questions: foundquestions
-	});
+router.get('/:qId/:aId/vote', (req, res) => {
+  answers.map((answer) => {
+    if (answer.questionId === Number(req.params.qId)
+    && answer.answerId === Number(req.params.aId)) {
+      answer.votes += 1;
+    }
+    return false;
+  });
+  res.send('Answer voted up!');
 });
 
-/* 
-	THIS ROUTE ALLOWS THE LOGGED USER TO VIEW THE QUESTION WITH 
-	THE MOST ACTIVITY, THAT QUESTION WITH THE MOST ANSWERS/COMMENTS
-*/
-router.get('/top/question',(req, res)=>{
-	let ansd_qtn = [];
-	answers.map(answer=>ansd_qtn.push(answer.questionId));
-	let modeqtn = mode(ansd_qtn);
-	let topqtn = questions.filter(question=>question.questionId == modeqtn);
-	res.render('questionsLog', {
-		questions: topqtn
-	});
+router.get('/:downvote/:qId/:aId', (req, res) => {
+  answers.map((answer) => {
+    if (answer.questionId === Number(req.params.qId)
+    && answer.answerId === Number(req.params.aId)) {
+      if (answer.votes > 0) {
+        answer.votes -= 1;
+      } else {
+        answer.votes = answer.votes;
+      }
+    }
+    return false;
+  });
+  res.send('Answer voted down!');
 });
 
-/*
-	ROUTE TO HANDLE ADDING OF COMMENTS TO A PARTICULAR ANSWER ON THE PLATFORM
-*/
-router.post('/addcomment/:qId/:answerId', (req, res)=>{
-	let questId = req.params.qId;
-	let ansId = req.params.answerId;
-	let comment = req.body.comment;
-	answers.map(ans=>{
-		if(ans.questionId == questId && ans.answerId == ansId){
-			ans.comments.push({
-				commentId: generateUniqueId(ans.comments, "commentId"),
-				comment: comment,
-				userId : req.body.userId,
-				username: req.body.username,
-				questionId : questId
-			});
-		}
-	});
-	res.redirect(`/api/v1/questions/questionThread/${questId}`);
+router.get('/user/:userId', (req, res) => {
+  const uId = Number(req.params.userId);
+  const userQuestions = questions.filter(qtn => qtn.userId === uId);
+  res.json(userQuestions);
+});
+
+router.get('/questionsAnswered/:userId', (req, res) => {
+  const uId = Number(req.params.userId);
+  const qansd = [];
+  answers.map((ans) => {
+    if (ans.userId === uId) {
+      qansd.push(ans.questionId);
+    }
+    return false;
+  });
+  const foundquestions = [];
+  qansd.map((id) => {
+    questions.map((question) => {
+      if (question.questionId === id) {
+        foundquestions.push(question);
+      }
+      return false;
+    });
+    return false;
+  });
+  res.json(foundquestions);
+});
+
+router.get('/top/question', (req, res) => {
+  const ansdqtn = [];
+  answers.map(answer => ansdqtn.push(answer.questionId));
+  const modeqtn = mode(ansdqtn);
+  const topqtn = questions.filter(question => question.questionId === modeqtn);
+  res.json(topqtn);
+});
+
+router.post('/addcomment/:qId/:answerId', (req, res) => {
+  const questId = Number(req.params.qId);
+  const ansId = Number(req.params.answerId);
+  const { comment } = req.body;
+  answers.map((ans) => {
+   if (ans.questionId === questId && ans.answerId === ansId) {
+      ans.comments.push({
+        commentId: generateUniqueId(ans.comments, 'commentId'),
+        comment,
+        userId: req.body.userId,
+        username: req.body.username,
+        questionId: questId,
+      });
+    }
+    return false;
+  });
+  res.send('Comment added successfully!');
 });
 
 
-export default router
+export default router;

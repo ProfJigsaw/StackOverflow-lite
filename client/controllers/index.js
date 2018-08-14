@@ -1,8 +1,12 @@
 import express from 'express';
+import questionspage from './questions';
+
 const router = express.Router();
 
-router.get('/', (req, res)=>{
-	res.redirect('/api/v1/user');
+router.get('/', (req, res) => {
+  res.send('welcome to StackOverflow-Lite');
 });
 
-export default router
+router.use('/questions', questionspage);
+
+export default router;
