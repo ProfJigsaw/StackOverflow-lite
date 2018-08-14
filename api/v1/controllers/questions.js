@@ -173,99 +173,90 @@ router.post('/:qId/:aId/accept', (req, res) => {
 
 router.get('/:qId/:aId/vote', (req, res) => {
   answers.map((answer) => {
-    if (answer.questionId === Number(req.params.qId) && answer.answerId == Number(req.params.aId)) {
-				answer.votes += 1;
-		}
-	});
-	res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`)
+    if (answer.questionId === Number(req.params.qId)
+    && answer.answerId === Number(req.params.aId)) {
+      answer.votes += 1;
+    }
+    return false;
+  });
+  res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`);
 });
 
-/*
-	ROUTE TO HANDLE A VOTE DOWN REQUEST OF A PARTICULAR QUESTION,
-	THIS ROUTE WILL NOT DO ANYTHING IF THE ANSWER VOTES ARE ALREADY AT ZERO
-*/
 router.get('/:downvote/:qId/:aId', (req, res) => {
-	answers.map((answer) => {
-		if(answer.questionId == req.params.qId && answer.answerId == req.params.aId){
-			if(answer.votes > 0){
-				answer.votes = answer.votes - 1;
-			}else{
-				answer.votes = answer.votes;
-			}
-		}
-	})
-	res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`)
-})
-
-/*
-	ROUTE TO HANDLE REQUEST BY A USER TO SEE ALL THE
-	QUESTIONS THAT THEY EVER POSTED ON THE PLATFOROM
-*/
-router.get('/user/:userId', (req, res)=>{
-	let uId = req.params.userId;
-	let userQuestions = questions.filter(qtn=>qtn.userId == uId);
-	res.render('questionsLog', {
-		questions: userQuestions
-	});
+  answers.map((answer) => {
+    if (answer.questionId === Number(req.params.qId)
+    && answer.answerId === Number(req.params.aId)) {
+      if (answer.votes > 0) {
+        answer.votes -= 1;
+      } else {
+        answer.votes = answer.votes;
+      }
+    }
+    return false;
+  });
+  res.redirect(`/api/v1/questions/questionThread/${req.params.qId}`);
 });
 
-/*
-	ROUTE TO HANDLE REQUEST BY A USER TO SEE ALL THE 
-	QUESTION THEY HAVE EVER GIVEN A RESPONSE TO.
-*/
-router.get('/questionsAnswered/:userId',(req, res)=>{
-	let uId = req.params.userId;
-	let qansd = [];
-	answers.map(ans=>{
-		if(ans.userId == uId)
-			qansd.push(ans.questionId)
-	});
-	let foundquestions = [];
-	qansd.map(id=>{
-		questions.map(question=>{
-			if(question.questionId == id)
-				foundquestions.push(question);
-		});
-	});
-	res.render('questionsLog', {
-		questions: foundquestions
-	});
+router.get('/user/:userId', (req, res) => {
+  const uId = Number(req.params.userId);
+  const userQuestions = questions.filter(qtn => qtn.userId === uId);
+  res.render('questionsLog', {
+    questions: userQuestions,
+  });
 });
 
-/* 
-	THIS ROUTE ALLOWS THE LOGGED USER TO VIEW THE QUESTION WITH 
-	THE MOST ACTIVITY, THAT QUESTION WITH THE MOST ANSWERS/COMMENTS
-*/
-router.get('/top/question',(req, res)=>{
-	let ansd_qtn = [];
-	answers.map(answer=>ansd_qtn.push(answer.questionId));
-	let modeqtn = mode(ansd_qtn);
-	let topqtn = questions.filter(question=>question.questionId == modeqtn);
-	res.render('questionsLog', {
-		questions: topqtn
-	});
+router.get('/questionsAnswered/:userId', (req, res) => {
+  const uId = Number(req.params.userId);
+  const qansd = [];
+  answers.map((ans) => {
+    if (ans.userId === uId) {
+      qansd.push(ans.questionId);
+    }
+    return false;
+  });
+  const foundquestions = [];
+  qansd.map((id) => {
+    questions.map((question) => {
+      if (question.questionId === id) {
+        foundquestions.push(question);
+      }
+      return false;
+    });
+    return false;
+  });
+  res.render('questionsLog', {
+    questions: foundquestions,
+  });
 });
 
-/*
-	ROUTE TO HANDLE ADDING OF COMMENTS TO A PARTICULAR ANSWER ON THE PLATFORM
-*/
-router.post('/addcomment/:qId/:answerId', (req, res)=>{
-	let questId = req.params.qId;
-	let ansId = req.params.answerId;
-	let comment = req.body.comment;
-	answers.map(ans=>{
-		if(ans.questionId == questId && ans.answerId == ansId){
-			ans.comments.push({
-				commentId: generateUniqueId(ans.comments, "commentId"),
-				comment: comment,
-				userId : req.body.userId,
-				username: req.body.username,
-				questionId : questId
-			});
-		}
-	});
-	res.redirect(`/api/v1/questions/questionThread/${questId}`);
+router.get('/top/question', (req, res) => {
+  const ansdqtn = [];
+  answers.map(answer => ansdqtn.push(answer.questionId));
+  const modeqtn = mode(ansdqtn);
+  const topqtn = questions.filter(question => question.questionId === modeqtn);
+  res.render('questionsLog', {
+    questions: topqtn,
+  });
+});
+
+router.post('/addcomment/:qId/:answerId', (req, res) => {
+  const questId = Number(req.params.qId);
+  const ansId = Number(req.params.answerId);
+  const { comment } = req.body;
+  answers.map((ans) => {
+   if (ans.questionId === questId && ans.answerId === ansId) {
+      ans.comments.push({
+        commentId: generateUniqueId(ans.comments, 'commentId'),
+        comment,
+        userId: req.body.userId,
+        username: req.body.username,
+        questionId: questId,
+      });
+    }
+    return false;
+  });
+  res.redirect(`/api/v1/questions/questionThread/${questId}`);
 });
 
 
-export default router
+export default router;

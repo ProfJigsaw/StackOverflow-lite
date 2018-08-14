@@ -1,59 +1,59 @@
 import chai from 'chai';
-import server from '../app';
 import request from 'supertest';
+import server from '../app';
 
-import mode from '../api/v1/helpers/mode'
-import getUserId from '../api/v1/helpers/getUserId'
-import genUniqueId from '../api/v1/helpers/genUniqueId'
-import getUserEmail from '../api/v1/helpers/getUserEmail'
+import mode from '../api/v1/helpers/mode';
+import getUserId from '../api/v1/helpers/getUserId';
+import genUniqueId from '../api/v1/helpers/genUniqueId';
+import getUserEmail from '../api/v1/helpers/getUserEmail';
 
-const expect = chai.expect;
-var should = chai.should();
+const { expect } = chai;
 
-describe('Helper function tests', ()=>{
-	it('Mode should return the number with greatest frequency', ()=>{
-		expect(mode([1,1,1,1,2,3,4,1,1,1,3])).to.equal(1);
+describe('Helper function tests', () => {
+	it('Mode should return the number with greatest frequency', () => {
+    expect(mode([1, 1, 1, 1, 2, 3, 4, 1, 1, 1, 3])).to.equal(1);
+  });
+
+	it('genUniqueId should generate a unique id', () => {
+    expect(genUniqueId([{ a: 1 }], 'a')).to.equal(2);
 	});
 
-	it('genUniqueId should generate a unique id', ()=>{
-		expect(genUniqueId([{a:1}],"a")).to.equal(2);
-	});
-	it('genUniqueId should default to a value of 1, if key not found', ()=>{
-		expect(genUniqueId([{a:1}],"unknownkey")).to.equal(1);
+	it('genUniqueId should default to a value of 1, if key not found', () => {
+    expect(genUniqueId([{ a: 1 }], 'unknownkey')).to.equal(1);
 	});
 
-	it('getUserEmail should generate user email from an array of objects', ()=>{
-		expect(getUserEmail([{
-			username: "Jigsaw",
-			email: "dhagodfather@gmail.com",
-			password: "tfu4vucker",
-			userId: 1,
-		}], "Jigsaw")).to.equal("dhagodfather@gmail.com");
-	});
-	it('getUserEmail should return an empty string if key not found in array of objects', ()=>{
-		expect(getUserEmail([{
-			username: "Jigsaw",
-			email: "dhagodfather@gmail.com",
-			password: "tfu4vucker",
-			userId: 1,
-		}], "fakeusername")).to.equal("");
+	it('getUserEmail should generate user email from an array of objects', () => {
+    expect(getUserEmail([{
+      username: 'Jigsaw',
+      email: 'dhagodfather@gmail.com',
+      password: 'tfu4vucker',
+      userId: 1,
+    }], 'Jigsaw')).to.equal('dhagodfather@gmail.com');
+  });
+  it('getUserEmail should return an empty string if key not found in array of objects', () => {
+    expect(getUserEmail([{
+      username: 'Jigsaw',
+      email: 'dhagodfather@gmail.com',
+      password: 'tfu4vucker',
+      userId: 1,
+    }], 'fakeusername')).to.equal('');
 	});
 
-	it('getUserId should return a users id from an array', ()=>{
-		expect(getUserId([{
-			username: "Jigsaw",
-			email: "dhagodfather@gmail.com",
-			password: "tfu4vucker",
-			userId: 1,
-		}],"Jigsaw")).to.equal(1)
-	});
-	it('getUserId should return a default of 0 if key not found in an array', ()=>{
-		expect(getUserId([{
-			username: "Jigsaw",
-			email: "dhagodfather@gmail.com",
-			password: "tfu4vucker",
-			userId: 1,
-		}],"anotherfakeuser")).to.equal(0)
+	it('getUserId should return a users id from an array', () => {
+    expect(getUserId([{
+      username: 'Jigsaw',
+      email: 'dhagodfather@gmail.com',
+      password: 'tfu4vucker',
+      userId: 1,
+    }], 'Jigsaw')).to.equal(1);
+  });
+  it('getUserId should return a default of 0 if key not found in an array', ()=>{
+    expect(getUserId([{
+      username: 'Jigsaw',
+      email: 'dhagodfather@gmail.com',
+      password: 'tfu4vucker',
+      userId: 1,
+    }], 'anotherfakeuser')).to.equal(0)
 	});
 
 });

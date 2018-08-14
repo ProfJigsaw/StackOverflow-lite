@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register --exit",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "prepublish": "rm -rf ./build && babel src/ --out-dir build/",
+    "coveralls": "NODE_ENV=test nyc npm test && nyc report --reporter=lcov --reporter=text --reporter=lcovonly || coveralls",
     "start": "nodemon app.js --exec babel-node --presets babel-preset-es2015"
   },
   "repository": {
@@ -16,7 +17,12 @@
     "exclude": [
       "**/controllers/**",
       "client"
-    ]
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false
   },
   "keywords": [
     "babel",
