@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/error', (req, res) => {
-  res.send('Error Page!');
+  res.send('There was an error!');
 });
 
 router.get('/:id', (req, res) => {
