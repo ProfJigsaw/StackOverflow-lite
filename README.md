@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/ProfJigsaw/StackOverflow-lite.svg?branch=master)](https://travis-ci.org/ProfJigsaw/StackOverflow-lite)
 [![Build Status](https://travis-ci.org/ProfJigsaw/StackOverflow-lite.svg?branch=feature)](https://travis-ci.org/ProfJigsaw/StackOverflow-lite)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f7236c27c148d101bf35/maintainability)](https://codeclimate.com/github/ProfJigsaw/StackOverflow-lite/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f7236c27c148d101bf35/test_coverage)](https://codeclimate.com/github/ProfJigsaw/StackOverflow-lite/test_coverage)
