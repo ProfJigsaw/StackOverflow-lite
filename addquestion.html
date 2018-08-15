@@ -11,10 +11,10 @@
             <div id="title-bar">
                 <div class="logo-name">
                     <img src="./assets/picture1.png" alt="" id="logo">
-                    <a class="siteName" href="./index.html">StackOverflow-Lite</a>
+                    <a class="siteName" href="#">StackOverflow-Lite</a>
                 </div>
                 <div class="search-box">
-                    <form method="post" action="#" name="SearchForm">
+                    <form method="post" action="#"name="SearchForm">
                         <input id="search-input" type="text" name="keyword" placeholder="Find Question..." />
                     </form>
                 </div>
@@ -24,7 +24,6 @@
                 </div>
             </div>
             <div id="main-content-area">
-                .
                 <div id="feature-panel">
                     <fieldset>
                         <legend> FEATURES</legend>
@@ -46,22 +45,16 @@
                     </fieldset>
                 </div>
                 <div id="main-content-container">
-                        <div id="profile-panel">
-                        <h1>Profile Information:</h1>
-                        <div id="user-info">
-                            <p>Your User Id: 5 </p>
-                            <p>Your Username: Kevin</p>
-                            <p>Your Email: newuser@stackOfL.com</p>
-                            <p>Your password: user123-XXXX</p>
-                        </div>
-                        <div id="user-pecks">
-                            <h4>Extra features:</h4>
-                            <a href="#">See your questions<a>
+                    <div id="add-question">
+                        <h3 id="loginformheader">User Dialog: Add question</h3>
+                        <form action="#" method="post">
+                            <label>Ask Your Question:
+                                <br>
+                                <textarea type="text" name="question" id="form-question-input"required></textarea>
+                            </label>
                             <br>
-                            <a href="#">See questions you answered</a>
-                            <br>
-                            <a href="#">See question with the most answers</a>
-                        </div>
+                            <input type="submit" value="Add question" name="submit" class="submit" />
+                        </form>
                     </div>
                 </div>
             </div>

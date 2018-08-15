@@ -11,46 +11,49 @@
             <div id="title-bar">
                 <div class="logo-name">
                     <img src="./assets/picture1.png" alt="" id="logo">
-                    <a class="siteName" href="#">StackOverflow-Lite</a>
+                    <a class="siteName" href="./index.html">StackOverflow-Lite</a>
                 </div>
                 <div class="search-box">
                     <form method="post" action="#"name="SearchForm">
                         <input id="search-input" type="text" name="keyword" placeholder="Find Question..." />
                     </form>
                 </div>
-                <div id="login">
-                    <a href="#">Login</a> Or  <a href="#">Sign Up</a>
+                <div id="profile">
+                    <a href="./userprofile.html">View Profile</a>
+                    <a href="./guestindex.html">Logout</a>
                 </div>
             </div>
             <div id="main-content-area">
-                .
                 <div id="feature-panel">
-                    <h3>FEATURES:</h3>
-                    <ul id="features">
-                        <li>
-                            <a href="#">Home</a>
-                        </li>
-                        <li>
-                            <a href="#">View:</a>
-                            <ul id="features-view">
-                                <li>
-                                    <a href="#">All questions asked</a>
-                                </li>
-                                <li>
-                                    <a href="#">Recently, asked questions</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <div>
-                        <a href="#"> Add a Question</a>
-                    </div>
+                    <fieldset>
+                        <legend> FEATURES</legend>
+                        <div id="features">
+                            <a href="./index.html">Home</a>
+                            <br>
+                            <a href="./questions.html">View all questions asked</a>
+                            <br>
+                            <form action="#" method="#">
+                                <p>Search by Id:</p>
+                                <input type="text" placeholer="Enter question Id" name="qid" /><br>
+                                <input type="submit" value="Find Question" name="submit" />
+                            </form>
+                            <br>
+                            <div>
+                                <a href="./addquestion.html"> Add a Question</a>
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
                 <div id="main-content-container">
                    <div id="questions">
                         <p><strong>#Q_ID: 1 - </strong></p>
-                        <p> User: <strong>Guest</strong> asked</p>
-                        <h3><a href="#">What is HTML?</a></h3>
+                        <p> User: <strong>Mike</strong> asked</p>
+                        <h3><a href="./thread.html">What is HTML?</a></h3>
+                    </div>
+                    <div id="questions">
+                        <p><strong>#Q_ID: 2 - </strong></p>
+                        <p> User: <strong>Theresa</strong> asked</p>
+                        <h3><a href="#">What is JAVASCRIPT?</a></h3>
                     </div>
                 </div>
             </div>

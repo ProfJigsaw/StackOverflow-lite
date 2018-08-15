@@ -1,11 +1,14 @@
 html, body{
 	margin: 0;
 	padding: 0;
+	height: auto;
+	background: url(../assets/picture1.png) repeat;
 }
 #container {
 	width: 100%;
-	height: 100%;
-	background: url(../assets/picture1.png);
+	height: auto;
+	background: url(../assets/background.jpg) repeat;
+	opacity: 0.975;
 }
 #container div {
 	display: block;
@@ -75,9 +78,6 @@ html, body{
 	height: 30px;
 	border-radius: 0;
 }
-#search-input:hover{
-	border-radius: 0;
-}
 #login, #profile {
 	margin-right: 0px;
 	width: 30%;
@@ -96,7 +96,7 @@ html, body{
 	border-bottom: 3px #ccc solid; 
 	margin: 10px;
 }
-#login a:visited{
+#login a:visited, #profile a:visited{
 	color: coral;
 }
 #loginformheader{
@@ -135,10 +135,8 @@ html, body{
 
 #main-content-area {
 	padding-top: 63px;
-	height: 1920px;
-	width: 100%;
-	background: url(../assets/background.jpg);
-	opacity: 0.975;/*
+	height: 7000px;
+	width: 100%;/*
 	overflow: scroll;*/
 }
 #main-content-container {
@@ -146,7 +144,7 @@ html, body{
 	font-family: "Bookman Old Style";
 	font-weight: normal;
 	line-height: 1.1em;
-	margin-left: 225px;
+	margin-left: 285px;
 	padding-left: 10px;
 	border-right: 1px #cccccc solid;
 	border-bottom-right-radius: 6px;
@@ -157,7 +155,7 @@ html, body{
 }
 
 #feature-panel{
-	width: 200px;
+	width: 280px;
 	height: 100%;
 	padding-left: 6px;
 	top: -10px;
@@ -179,6 +177,13 @@ html, body{
 	line-height: 1.5em;
 	letter-spacing: 0.1em;
 }
+#features input{
+	width: 200px;
+	font-weight: bold;
+	font-size: 16px;
+	border-bottom: 2px #ccc solid;
+	margin-bottom: 2px;
+}
 #plain-features{
 	color: black;
 	line-height: 2em;
@@ -189,6 +194,10 @@ html, body{
 }
 #features-view a{
 	border-bottom: 1px grey solid;
+}
+fieldset{
+	width: 240px;
+	font-weight: bold;
 }
 
 #footer {
@@ -218,16 +227,41 @@ html, body{
 	box-shadow: 0 2px 2px rgba(0,0,0,0.6);
 	font-size: 20px;
 }
+#questions input{
+	font-weight: bold;
+}
 #questions p{
 	display: inline;
 }
 .answers{
 	margin: 8px;
-	border: 2px #000 solid;
+	border: 2px #ccc solid;
 	padding: 5px;
 	width: auto;
 	height: auto;
 	font-size: 18px;
+	transition: all 1000ms linear;
+}
+.answers input{
+	font-weight: bold;
+	font-family: "Bookman Old Style"
+}
+.accepted{
+	border-right: 10px #0f0 solid;
+}
+.votes{
+	margin: 5px;
+}
+.votes span{
+	margin: 0 4px;
+	padding: 3px;
+	border-left: 2px grey solid;
+	border-right: 2px grey solid;
+	border-radius: 5px;
+}
+.votes a{
+	text-decoration: none;
+	font-weight: bold;
 }
 .comments{
 	margin: 10px;
@@ -239,6 +273,66 @@ html, body{
 	color: #fff;
 	font-size: 14px;
 }
+#add-comment-handle{
+
+}
+.show{
+	display: block;
+}
+#comment-form{
+	margin: 10px;
+	width: auto;
+	height: auto;
+	font-weight: bold;
+	border-bottom: 3px #000 solid;
+	border-left: 3px #000 solid;
+	border-right: 3px #000 solid;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+#comment-form textarea{
+	margin: 20px;
+	padding: 3px;
+	width: 92%;
+	height: 40px;
+}
+#comment-form input{
+	margin: 3px 40%;
+	padding: 3px;
+	width: 15%;
+	font-weight: bolder;
+}
+
+#add-answer, #add-question{
+	background-color: white;
+	margin: 6px;
+	border-top: 3px #000 solid;
+	padding: 5px;
+	width: auto;
+	height: 250px;
+	color: black;
+	font-size: 14px;
+	border-radius: 8px;
+}
+#add-answer textarea, #add-question textarea{
+	margin: 20px;
+	padding: 3px;
+	width: 90%;
+	height: 150px;
+}
+#add-answer input, #add-question input{
+	margin: 5px 30%;
+	background-color: blue;
+	color: white;
+	box-shadow: 0 2px 2px #ccc;
+	font-size: 24px;
+	font-weight: bold;
+	height: 40px;
+	width: 240px;
+
+}
+
 #oops-error{
 	font-family: "Bookman Old Style";
 	font-weight: bold;
@@ -277,4 +371,7 @@ html, body{
 	line-height: 3rem;
 	letter-spacing: 0.1em;
 	display: inline;
+}
+strong#username{
+	color: coral;
 }
