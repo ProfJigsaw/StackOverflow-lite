@@ -11,5 +11,4 @@ ratings:
 exclude_paths:
 - "build/"
 - "node_modules/"
-- "coverage/"
 - ".nyc_output/"
