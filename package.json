@@ -9,6 +9,9 @@
     "coveralls": "nyc npm test && nyc report --reporter=lcov --reporter=text --reporter=lcovonly || coveralls",
     "start": "nodemon app.js --exec babel-node --presets babel-preset-es2015"
   },
+  "engines": {
+    "node": "8.11.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ProfJigsaw/StackOverflow-lite.git"
