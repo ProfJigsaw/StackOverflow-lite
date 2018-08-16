@@ -189,11 +189,21 @@ router.get('/questionsAnswered/:userId', (req, res) => {
   res.json(foundquestions);
 });
 
-router.get('/top/question', (req, res) => {
-  const ansdqtn = [];
-  answers.map(answer => ansdqtn.push(answer.questionId));
-  const modeqtn = mode(ansdqtn);
-  const topqtn = questions.filter(question => question.questionId === modeqtn);
+router.get('/topquestion/:uId', (req, res) => {
+  const uId = Number(req.params.uId);
+  const userQuestions = questions.filter(qtn => Number(qtn.userId) === uId);
+  const questionsAnswered = [];
+  userQuestions.map((question) => {
+    answers.map((answer) => {
+      if (answer.questionId === question.questionId) {
+        questionsAnswered.push(question.questionId);
+      }
+      return false;
+    });
+    return false;
+  });
+  const modeqtn = mode(questionsAnswered);
+  const topqtn = userQuestions.filter(question => question.questionId === modeqtn);
   res.json(topqtn);
 });
 

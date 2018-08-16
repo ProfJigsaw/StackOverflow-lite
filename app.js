@@ -5,7 +5,7 @@ import expressApiVersioning from 'express-api-versioning';
 import bodyParser from 'body-parser';
 
 const app = express();
-let port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 app.engine('dust', cons.dust);
 app.set('view engine', 'dust');
