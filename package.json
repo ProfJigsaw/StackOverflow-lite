@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register --exit",
-    "build": "rm -rf ./build && babel --watch ./ --out-dir build/",
+    "build": "babel ./api --out-dir ./dist --source-maps --copy-files",
     "coveralls": "nyc npm test && nyc report --reporter=lcov --reporter=text --reporter=lcovonly || coveralls",
     "start": "nodemon app.js --exec babel-node --presets babel-preset-es2015"
   },
@@ -20,6 +20,7 @@
     "exclude": [
       "**/controllers/**",
       "**/model/**",
+      "**/dist/**",
       "client"
     ],
     "require": [
