@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
         <link rel="shortcut icon" href="./assets/picture1.png">
         <title>StackOverflow-Lite</title>
         <link rel="stylesheet" href="./css/style.css">
@@ -19,7 +20,7 @@
                     </form>
                 </div>
                 <div id="profile">
-                    <a href="./userprofile.html">View Profile</a>
+                    <a href="./userprofile.html">Profile</a>
                     <a href="./guestindex.html">Logout</a>
                 </div>
             </div>
@@ -39,6 +40,8 @@
                             </form>
                             <br>
                             <div>
+                                <a href="./questions.html">Recently asked questions</a>
+                                <br>
                                 <a href="./addquestion.html"> Add a Question</a>
                             </div>
                         </div>
@@ -46,7 +49,6 @@
                 </div>
                 <div id="main-content-container">
                    <div id="questions">
-                        <p><strong>#Q_ID: 1 - </strong></p>
                         <p> User: <strong>Mike</strong> asked</p>
                         <h3>What is HTML?</h3>
                     </div>
@@ -61,6 +63,7 @@
                             <a href="#">UpVote</a>
                             <span>0</span>
                             <a href="#">DownVote</a>
+                            <span>0</span>
                         </div>
                     </div>
                     <div class="comments">
@@ -77,7 +80,16 @@
                             <a href="#">UpVote</a>
                             <span>20</span>
                             <a href="#">DownVote</a>
+                            <span>2</span>
                         </div>
+                    </div>
+                    <!-- add answer -->
+                    <div id="add-answer">
+                        <form method="post" action="/api/v1/questions/{questions.questionId}/answers">
+                            <textarea type="text" name="answer" id="form-answer-input" required></textarea>
+                            <br>
+                            <input type="submit" value="Add answer" id="add-answer" name="submit" />
+                        </form>
                     </div>
                 </div>
             </div>

@@ -8,7 +8,7 @@ html, body{
 	width: 100%;
 	height: auto;
 	background: url(../assets/background.jpg) repeat;
-	opacity: 0.975;
+	opacity: 0.97;
 }
 #container div {
 	display: block;
@@ -29,7 +29,7 @@ html, body{
 	letter-spacing: 0.2em;
 	font-weight: bold;
 	text-decoration: underline;
-	color: coral;
+	color: rgba(255, 234, 0, 0.6);
 }
 .logo-name {
 	padding-top: 5px;
@@ -39,14 +39,14 @@ html, body{
 	font-size: 18px;
 	letter-spacing: 0.2em;
 	padding-left: 10px;
-	font-family: "Bookman Old Style";
+	font-family: 'Pacifico', cursive;
 	font-size: 16px;
 	font-weight: bold;
 	color: rgba(255, 234, 245, 0.9);
 }
 .siteName{
 	left: -10px;
-	font-family: "Bookman Old Style";
+	font-family: 'Pacifico', cursive;
 	font-size: 24px;
 	font-weight: bold;
 	text-decoration: none;
@@ -74,8 +74,6 @@ html, body{
 	transition: all 300ms linear;
 }
 #search-input:focus{
-	width: 220px;
-	height: 30px;
 	border-radius: 0;
 }
 #login, #profile {
@@ -104,13 +102,13 @@ html, body{
 	text-decoration: underline;
 	font-size: 24px;
 	font-family: "tahoma";
-
+	color: rgba(255, 234, 245, 0.9);
 }
 #loginform, #signupform{
 	margin: 100px 22%;
 	width: 400px;
 	height: auto;
-	background-color: #ddf;
+	background-color: rgb(46, 98, 116);
 	padding: 10px;
 	border: 3px #ccc solid;
 	border-radius: 5px;
@@ -121,6 +119,15 @@ html, body{
 	height: 30px;
 	border-bottom: 2px black solid;
 	font-size: 18px;
+}
+#submit{
+	margin: 10px 100px;
+	width: 150px;
+	height: 60px;
+	border-radius: 15px;
+	border-bottom: 2px black solid;
+	font-size: 18px;
+	box-shadow: 0 2px 2px 0 #000;
 }
 #loginform label, #signupform label{
 	margin: 5px 100px;
@@ -135,8 +142,10 @@ html, body{
 
 #main-content-area {
 	padding-top: 63px;
-	height: 7000px;
-	width: 100%;/*
+	height: 1100px;
+	width: 100%;
+	background: rgba(0,0,0,0.3);
+	/*
 	overflow: scroll;*/
 }
 #main-content-container {
@@ -208,7 +217,7 @@ fieldset{
 	bottom: 0;
 	left: 0;
 	padding: 1rem;
-	background-color: #cccccc;
+	background: url(../assets/bg3.jpg) repeat;
 	text-align: center;
 	z-index: 9999;
 }
@@ -222,10 +231,14 @@ fieldset{
 #questions{
 	margin: 6px;
 	padding: 5px;
-	background-color: #ccc; 
+	background-color: rgb(46, 98, 116); 
 	border-right: 10px #000 solid;
 	box-shadow: 0 2px 2px rgba(0,0,0,0.6);
 	font-size: 20px;
+	color:  rgba(220, 220, 220, 1);
+}
+#questions a{
+	color: white;
 }
 #questions input{
 	font-weight: bold;
@@ -305,7 +318,7 @@ fieldset{
 }
 
 #add-answer, #add-question{
-	background-color: white;
+	background-color: #008CBA;
 	margin: 6px;
 	border-top: 3px #000 solid;
 	padding: 5px;
@@ -320,10 +333,11 @@ fieldset{
 	padding: 3px;
 	width: 90%;
 	height: 150px;
+	border: 2px #000 solid;
 }
 #add-answer input, #add-question input{
 	margin: 5px 30%;
-	background-color: blue;
+	background-color: rgb(105, 116, 167);
 	color: white;
 	box-shadow: 0 2px 2px #ccc;
 	font-size: 24px;
@@ -393,5 +407,62 @@ span#askq{
 	text-decoration: underline;
 }
 strong#username{
-	color: coral;
+	color: rgb(68, 44, 35);
+}
+@media only screen and (max-width: 800px) {
+    #feature-panel{
+			position: relative;
+			width: 90%;
+			height: 100px;
+		}
+		fieldset{
+			width: 80%;
+			font-weight: bold;
+		}
+		#main-content-container {
+			width: 90%;
+			height: 60%;
+			margin-top:115px;
+			margin-left: 5px;
+		}
+		.logo-name {
+			font-size: 0px;
+		}
+		.logo-name a{
+			font-size: 0px;
+		}
+		#search-input{
+			width: 40%;
+			border-radius: 6px;
+			padding: 6px;
+			border-bottom: 1px #ddd solid;
+			transition: all 300ms linear;
+		}
+		.search-box {
+			width: 20%;
+			height: 50px;
+			margin-left: -30%;
+		}
+		#login, #profile {
+			top: -20px;
+			width: 50%;
+			height: 50px;
+			float: right;
+			font-size: 18px;
+			font-weight: bold;
+			left: -50px;
+		}
+		#user-info, #user-pecks{
+			width: 80%;
+		}
+		#add-answer input, #add-question input{
+			margin: 5px auto;
+			background-color: rgb(69, 69, 134);
+			color: white;
+			box-shadow: 0 2px 2px #ccc;
+			font-size: 24px;
+			font-weight: bold;
+			height: 40px;
+			width: 90%;
+		}
 }

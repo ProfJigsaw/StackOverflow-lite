@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+  <link rel="shortcut icon" href="./assets/picture1.png">
+  <title>StackOverflow-Lite</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+</head>
+
+<body>
+  <div id="container">
+    <div id="title-bar">
+      <div class="logo-name">
+        <img src="./assets/picture1.png" alt="" id="logo">
+        <a class="siteName" href="./index.html">StackOverflow-Lite</a>
+      </div>
+      <div class="search-box">
+        <form method="post" action="#" name="SearchForm">
+          <input id="search-input" type="text" name="keyword" placeholder="Find Question..." />
+        </form>
+      </div>
+      <div id="profile">
+        <a href="./userprofile.html">View Profile</a>
+        <a href="./guestindex.html">Logout</a>
+      </div>
+    </div>
+    <div id="main-content-area">
+      <div id="feature-panel">
+        <fieldset>
+          <legend> FEATURES</legend>
+          <div id="features">
+            <a href="./index.html">Home</a>
+            <br>
+            <a href="./questions.html">View all questions asked</a>
+            <br>
+            <form action="#" method="#">
+              <p>Search by Id:</p>
+              <input type="text" placeholer="Enter question Id" name="qid" /><br>
+              <input type="submit" value="Find Question" name="submit" />
+            </form>
+            <br>
+            <div>
+              <a href="./questions.html">Recently asked questions</a>
+              <br>
+              <a href="./addquestion.html"> Add a Question</a>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div id="main-content-container">
+        <div id="questions">
+          <p> User: <strong>You</strong> asked</p>
+          <h3><a href="#">What is Life?</a></h3>
+        </div>
+        <div id="questions">
+          <p> User: <strong>You</strong> asked</p>
+          <h3><a href="#">What is Python?</a></h3>
+        </div>
+        <div id="questions">
+          <p> User: <strong>You</strong> asked</p>
+          <h3><a href="#">Which is better ReactJs or AngularJs?</a></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="footer">
+    &copy; Copyright 2018. StackOverflow-Lite.heroku.com
+  </div>
+  <script src="#"></script>
+</body>
+
+</html>
