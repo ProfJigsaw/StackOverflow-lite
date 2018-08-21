@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+        <link rel="shortcut icon" href="./assets/picture1.png">
+        <title>StackOverflow-Lite</title>
+        <link rel="stylesheet" href="./css/style.css">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+    </head>
+    <body>
+        <div id="container">
+            <div id="title-bar">
+                <div class="logo-name">
+                    <img src="./assets/picture1.png" alt="" id="logo">
+                    <a class="siteName" href="#">StackOverflow-Lite</a>
+                </div>
+                <div class="search-box">
+                    <form method="post" action="#"name="SearchForm">
+                        <input id="search-input" type="text" name="keyword" placeholder="Find Question..." />
+                    </form>
+                </div>
+                <div id="profile">
+                    <a href="./userprofile.html">Profile</a>
+                    <a href="./guestindex.html">Logout</a>
+                </div>
+            </div>
+            <div id="main-content-area">
+                <div id="feature-panel">
+                    <fieldset>
+                        <legend> FEATURES</legend>
+                        <div id="features">
+                            <a href="./index.html">Home</a>
+                            <br>
+                            <a href="./questions.html">View all questions asked</a>
+                            <br>
+                            <form action="#" method="#">
+                                <p>Search by Id:</p>
+                                <input type="text" placeholer="Enter question Id" name="qid" /><br>
+                                <input type="submit" value="Find Question" name="submit" />
+                            </form>
+                            <br>
+                            <div>
+                                <a href="./questions.html">Recently asked questions</a>
+                                <br>
+                                <a href="./addquestion.html"> Add a Question</a>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div id="main-content-container">
+                   <div id="questions">
+                        <p> User: <strong>Mike</strong> asked</p>
+                        <h3>What is HTML?</h3>
+                    </div>
+                    <div class="answers">
+                        <strong id="username">John</strong> answered:<p> HTML is a programming language.
+                        <form method="#" action="#">
+                            <strong>
+                                <input type="submit" value="Accept this answer"/>
+                            </strong>
+                        </form>
+                        <div class="votes">
+                            <a href="#">UpVote</a>
+                            <span>0</span>
+                            <a href="#">DownVote</a>
+                            <span>0</span>
+                        </div>
+                    </div>
+                    <div class="comments">
+                        Kevin commented: No, they are not
+                    </div>
+                    <div class="answers accepted">
+                        <strong id="username">James</strong> answered:<p> HTML is a markup language.
+                        <form method="#" action="#">
+                            <strong>
+                                <input type="submit" value="Accept this answer"/>
+                            </strong>
+                        </form>
+                        <div class="votes">
+                            <a href="#">UpVote</a>
+                            <span>20</span>
+                            <a href="#">DownVote</a>
+                            <span>2</span>
+                        </div>
+                    </div>
+                    <!-- add answer -->
+                    <div id="add-answer">
+                        <form method="post" action="/api/v1/questions/{questions.questionId}/answers">
+                            <textarea type="text" name="answer" id="form-answer-input" required></textarea>
+                            <br>
+                            <input type="submit" value="Add answer" id="add-answer" name="submit" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer">
+            &copy; Copyright 2018. StackOverflow-Lite.heroku.com
+        </div>
+        <script src="#"></script>
+    </body>
+</html>
