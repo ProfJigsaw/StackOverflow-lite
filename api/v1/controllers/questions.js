@@ -5,7 +5,7 @@ import generateUniqueId from '../helpers/genUniqueId';
 import mode from '../helpers/mode';
 
 const router = express.Router();
-let { questions, answers } = dbpackage;
+const { questions, answers } = dbpackage;
 const pool = new pg.Pool({
   host: 'ec2-54-235-242-63.compute-1.amazonaws.com',
   user: 'qioqlpbhbvemko',
@@ -119,28 +119,28 @@ router.post('/:id/answers', (req, res) => {
   res.json(answers);
 });
 
-router.post('/:id/delete', (req, res) => {
+router.delete('/:id', (req, res) => {
   const questId = Number(req.params.id);
   const { userId } = req.body;
-  let goAhead = false;
-  questions.map((question) => {
-    if (question.questionId === questId && question.userId === Number(userId)) {
-      goAhead = true;
-    }
-    return true;
-  });
-  if (goAhead === true) {
-    questions = questions.filter(question => question.questionId !== questId);
-    answers = answers.filter(answer => answer.questionId !== questId);
-    res.redirect('/api/v1/questions');
-  } else {
-    res.render('usererror', {
-      error: {
-        errorMsg: 'You are not the author of this question, therefore you cant delete it',
-        errorType: 'Delete Not Allowed',
-      },
-    });
+  if (!userId) {
+    return res.send('You must send along your user Id');
   }
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.send('Error fetching client from pool', err);
+    }
+    client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userId], (error, result) => {
+      if (error) {
+        res.send(error);
+      } if (result.rows.length === 0) {
+        res.send('You cannot delete this question');
+      } else {
+        client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
+        res.send('Successfully DELETED data from heroku postgres!');
+      }
+    });
+    done();
+  });
 });
 
 router.post('/:qId/:aId/accept', (req, res) => {
