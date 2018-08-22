@@ -18,13 +18,13 @@ const pool = new pg.Pool({
 router.get('/', (req, res) => {
   pool.connect((err, client, done) => {
     if (err) {
-      return res.send('error fetching client from pool', err);
+        return console.error('error fetching client from pool', err);
     }
     client.query('SELECT * FROM questions', (err, result) => {
-      res.send(result.rows);
+    	res.send(result.rows);
     });
     done();
-  });
+	});
 });
 
 router.post('/error', (req, res) => {
@@ -32,12 +32,25 @@ router.post('/error', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const found = questions.filter(o => o.questionId === id);
-  if (found.length === 1) {
-    res.json(found[0]);
+  let id = req.params.id;
+  id = id.replace(/[^0-9]+/, '');
+  id = Number(id);
+  if (id) {
+    pool.connect((err, client, done) => {
+      if (err) {
+        return res.send('error fetching client from pool', err);
+      }
+      client.query('SELECT * FROM questions WHERE questionid=$1', [id], (err, result) => {
+        if (result.rows.length === 0) {
+          res.send('This question id does not exist in the database');
+        } else {
+          res.send(result.rows);
+        }
+      });
+      done();
+    });
   } else {
-    res.send(`This question id [ ${id} ] doesnt exit yet, create it by posting at "/questions"`);
+    res.send('Id must be a number');
   }
 });
 
