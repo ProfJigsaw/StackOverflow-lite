@@ -16,7 +16,15 @@ const pool = new pg.Pool({
 });
 
 router.get('/', (req, res) => {
-  res.json(questions);
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.send('error fetching client from pool', err);
+    }
+    client.query('SELECT * FROM questions', (err, result) => {
+      res.send(result.rows);
+    });
+    done();
+  });
 });
 
 router.post('/error', (req, res) => {
