@@ -20,6 +20,7 @@
     "exclude": [
       "**/controllers/**",
       "**/model/**",
+      "**/middleware/**",
       "**/dist/**",
       "client"
     ],
@@ -62,7 +63,8 @@
     "consolidate": "^0.15.1",
     "express": "^4.16.3",
     "express-api-versioning": "^2.0.0",
-    "gemfile": "^1.0.0"
+    "gemfile": "^1.0.0",
+    "pg": "^7.4.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
