@@ -61,7 +61,13 @@ router.get('/:id', verifyToken, (req, res) => {
             if (result.rows.length === 0) {
               res.send('This question id does not exist in the database');
             } else {
-              res.send(result.rows);
+              client.query('SELECT * FROM answers WHERE questionid=$1', [id], (errForAns, answers) => {
+                if (result.rows.length === 0) {
+                  res.send('This question id does not exist in the database');
+                } else {
+                  res.send(['QUESTION:', ...result.rows, 'ANSWERS:', ...answers.rows]);
+                }
+              });
             }
           });
           done();
