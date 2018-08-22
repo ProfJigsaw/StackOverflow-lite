@@ -104,19 +104,22 @@ router.post('/', (req, res) => {
 });
 
 router.post('/:id/answers', (req, res) => {
-  const questId = req.params.id;
-  const entPut = req.body.answer;
-  answers.push({
-    answerId: generateUniqueId(answers, 'answerId'),
-    questionId: Number(questId),
-    userId: Number(req.body.userId),
-    username: req.body.username,
-    answer: entPut,
-    answerState: '',
-    votes: 0,
-    comments: [],
-  });
-  res.json(answers);
+  pool.connect((err, client, done) => {
+      if (err) {
+        return res.send('error fetching client from pool', err);
+      }
+      client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
+        req.params.id,
+        req.body.userId,
+        req.body.username,
+        req.body.answer,
+        0,
+        0,
+        0,
+      ]);
+      done();
+      res.send('Successfully inserted answer into heroku postgres DB!');
+    });
 });
 
 router.delete('/:id', (req, res) => {
