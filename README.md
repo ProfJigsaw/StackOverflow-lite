@@ -24,7 +24,7 @@ These instructions will get you a copy of the project up and running on your loc
 To install this API on your your machine, you need to first clone this repository or download the zip file. Once this is set up, you are going to need the following packages
 ```
 [NodeJs]
-[Node Package Installer - NPM]
+[Node Package Installer - NPM] _this usually comes with Node.
 ```
 
 ### Installing
@@ -33,7 +33,7 @@ Installing this application is fairly straightforward. After cloning this reposi
 
 > npm install
 
-This would essentially install all the development dependencies on your machine. Some of the major dependencies include@
+This would essentially install all the development dependencies on your machine. Some of the major dependencies include:
 
 ```
 Express - for creating a server
@@ -48,7 +48,7 @@ Once the installation is complete, we run the start script as follows:
 
 > npm start
 
-This runs the background processes;
+This runs the following script on the background processes;
 
 ```
 nodemon app.js --exec babel-node --presets babel-preset-es2015
@@ -56,7 +56,7 @@ nodemon app.js --exec babel-node --presets babel-preset-es2015
 
 ## Running the tests
 
-To run test we simply run the following command on the command prompt
+To run test we simply run the following on the command prompt
 
 > npm test
 
@@ -74,7 +74,7 @@ This app is deployed on the popular hosting cloud platform [heroku](https://hero
 
 ## Versioning
 
-This API makes use of the [express-url-versioning](https://www.npmjs.com/package/express-api-versioning) tool.
+This API makes use of the [express-url-versioning](https://www.npmjs.com/package/express-api-versioning) tool. A simple library that makes url versioning relatively easy.
 
 ## Author
 
@@ -83,9 +83,9 @@ This API makes use of the [express-url-versioning](https://www.npmjs.com/package
 
 ## License
 
-This project is licensed under the MIT License [License](https://opensource.org/licenses/MIT)
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT)
 
 ## Acknowledgments
 
-* Hat tip to all open source developer outthere making the world a better place
-* Regards to the AndelaNG team for making this a reality for me
+* Hat tip to all open source developers out there making the world a better place through technology.
+* Regards to the AndelaNG team for making this a reality for me.
