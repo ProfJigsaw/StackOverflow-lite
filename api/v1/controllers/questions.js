@@ -146,31 +146,25 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-router.post('/:qId/:aId/accept', (req, res) => {
+router.put('/:qId/answers/:aId/', (req, res) => {
   const questId = Number(req.params.qId);
   const answerId = Number(req.params.aId);
   const uId = req.body.userId;
-  let goAhead = false;
-  questions.map((question) => {
-    if (question.questionId === questId && question.userId === Number(uId)) {
-      goAhead = true;
-    }
-    return true;
-  });
-  /* eslint-disable no-param-reassign */
-  if (goAhead === true) {
-    answers.map((ans) => {
-      if (ans.answerId === answerId) {
-        ans.acceptState = 'accepted';
-      } else {
-        ans.acceptState = '';
-      }
-      return true;
+    pool.connect((err, client, done) => {
+        if (err) {
+            return res.send('error fetching client from pool', err);
+        }
+        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, uId], (error, result) => {
+          if (error) {
+            return res.send(error);
+          } if (result.rows.length === 0) {
+            return res.send('You cannot accept this question, you are not the author');
+          }
+          client.query('UPDATE answers SET state=$1 WHERE answerid=$2', [1, answerId]);
+          done();
+          res.send('Answer accepted');
+        });
     });
-    res.json(answers);
-  } else {
-    res.send('You cant accept this, you didnt create the question');
-  }
 });
 
 router.get('/:qId/:aId/vote', (req, res) => {
