@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import express from 'express';
 import pg from 'pg';
 import dbpackage from '../model/dbstruct';
@@ -15,55 +16,61 @@ const pool = new pg.Pool({
   ssl: true,
 });
 
-router.get('/', (req, res) => {
-  pool.connect((err, client, done) => {
-    if (err) {
-        return console.error('error fetching client from pool', err);
-    }
-    client.query('SELECT * FROM questions', (err, result) => {
-    	res.send(result.rows);
-    });
-    done();
-	});
-});
+function verifyToken(req, res, next) {
+  const bearHeader = req.headers.authorization;
+  if (bearHeader) {
+    [, req.token] = bearHeader.split(' ');
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
 
-router.post('/error', (req, res) => {
-  res.send('There was an error!');
-});
-
-router.get('/:id', (req, res) => {
-  let id = req.params.id;
-  id = id.replace(/[^0-9]+/, '');
-  id = Number(id);
-  if (id) {
-    pool.connect((err, client, done) => {
-      if (err) {
-        return res.send('error fetching client from pool', err);
-      }
-      client.query('SELECT * FROM questions WHERE questionid=$1', [id], (err, result) => {
-        if (result.rows.length === 0) {
-          res.send('This question id does not exist in the database');
-        } else {
-          res.send(result.rows);
+router.get('/', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.send('error fetching client from pool', err);
         }
+        client.query('SELECT * FROM questions', (bugFound, result) => {
+          res.send(result.rows);
+        });
+        done();
       });
-      done();
-    });
-  } else {
-    res.send('Id must be a number');
-  }
+    }
+  });
 });
 
-router.get('/questionThread/:qId', (req, res) => {
-  const id = Number(req.params.qId);
-  const found = questions.filter(o => o.questionId === id);
-  if (found.length === 1) {
-    const qId = found[0].questionId;
-    const answerForQuestion = answers.filter(o => o.questionId === qId);
-    res.json(answerForQuestion);
-  } else {
-    res.send('This question id was not found');
-  }
+router.get('/:id', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      let { id } = req.params;
+      id = id.replace(/[^0-9]+/, '');
+      id = Number(id);
+      if (id) {
+        pool.connect((err, client, done) => {
+          if (err) {
+            return res.send('error fetching client from pool', err);
+          }
+          client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
+            if (result.rows.length === 0) {
+              res.send('This question id does not exist in the database');
+            } else {
+              res.send(result.rows);
+            }
+          });
+          done();
+        });
+      } else {
+        res.send('Id must be a number');
+      }
+    }
+  });
 });
 
 router.post('/findQuestion', (req, res) => {
@@ -88,71 +95,93 @@ router.post('/findQuestionById', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
-  pool.connect((err, client, done) => {
-    if (err) {
-      return console.error('error fetching client from pool', err);
-    }
-    client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
-      Number(req.body.userId),
-      req.body.username,
-      req.body.question,
-    ]);
-    done();
-    res.send('Successfully inserted data into heroku postgres!');
-  });
-});
-
-router.post('/:id/answers', (req, res) => {
-  pool.connect((err, client, done) => {
-      if (err) {
-        return res.send('error fetching client from pool', err);
-      }
-      client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
-        req.params.id,
-        req.body.userId,
-        req.body.username,
-        req.body.answer,
-        0,
-        0,
-        0,
-      ]);
-      done();
-      res.send('Successfully inserted answer into heroku postgres DB!');
-    });
-});
-
-router.delete('/:id', (req, res) => {
-  const questId = Number(req.params.id);
-  const { userId } = req.body;
-  if (!userId) {
-    return res.send('You must send along your user Id');
-  }
-  pool.connect((err, client, done) => {
-    if (err) {
-      return res.send('Error fetching client from pool', err);
-    }
-    client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userId], (error, result) => {
-      if (error) {
-        res.send(error);
-      } if (result.rows.length === 0) {
-        res.send('You cannot delete this question');
-      } else {
-        client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
-        res.send('Successfully DELETED data from heroku postgres!');
-      }
-    });
-    done();
-  });
-});
-
-router.put('/:qId/answers/:aId/', (req, res) => {
-  const questId = Number(req.params.qId);
-  const answerId = Number(req.params.aId);
-  const uId = req.body.userId;
-    pool.connect((err, client, done) => {
+router.post('/', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      pool.connect((err, client, done) => {
         if (err) {
-            return res.send('error fetching client from pool', err);
+          return res.send('error fetching client from pool', err);
+        }
+        client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
+          Number(req.body.userId),
+          req.body.username,
+          req.body.question,
+        ]);
+        done();
+        res.send('Successfully inserted data into heroku postgres Database!');
+      });
+    }
+  });
+});
+
+router.post('/:id/answers', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.send('error fetching client from pool', err);
+        }
+        client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
+          req.params.id,
+          req.body.userId,
+          req.body.username,
+          req.body.answer,
+          0,
+          0,
+          0,
+        ]);
+        done();
+        res.send('Successfully inserted answer into heroku postgres DB!');
+      });
+    }
+  });
+});
+
+router.delete('/:id', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      const questId = Number(req.params.id);
+      const { userId } = req.body;
+      if (!userId) {
+        return res.send('You must send along your user Id');
+      }
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.send('Error fetching client from pool', err);
+        }
+        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userId], (error, result) => {
+          if (error) {
+            res.send(error);
+          } if (result.rows.length === 0) {
+            res.send('You cannot delete this question');
+          } else {
+            client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
+            res.send('Successfully DELETED data from heroku postgres!');
+          }
+        });
+        done();
+      });
+    }
+  });
+});
+
+router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      const questId = Number(req.params.qId);
+      const answerId = Number(req.params.aId);
+      const uId = req.body.userId;
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.send('error fetching client from pool', err);
         }
         client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, uId], (error, result) => {
           if (error) {
@@ -164,7 +193,9 @@ router.put('/:qId/answers/:aId/', (req, res) => {
           done();
           res.send('Answer accepted');
         });
-    });
+      });
+    }
+  });
 });
 
 router.get('/:qId/:aId/vote', (req, res) => {

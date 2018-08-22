@@ -125,19 +125,19 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
   it('it should get the total questions', (done) => {
     request(server)
     .get('/api/v1/questions')
-    .expect(200)
+    .expect(403)
     .end(done);
   });
   it('it should get the specified question successfully', (done) => {
     request(server)
     .get('/api/v1/questions/2')
-    .expect(200)
+    .expect(403)
     .end(done);
   });
-  it('it should should throw an http 404 error when requesting non existent thread', (done) => {
+  it('it should result in forbidden http status', (done) => {
     request(server)
-    .get('/api/v1/questions/questionThread/1222')
-    .expect(/not found/)
+    .get('/api/v1/auth/users')
+    .expect(403)
     .end(done);
   });
   it('it should post a question successfully', (done) => {
@@ -148,7 +148,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       userId: 3,
       question: 'what is life?',
     })
-    .expect(200)
+    .expect(403)
     .end(done);
   });
   it('it should post answer successfully', (done) => {
@@ -159,7 +159,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       userId: 2,
       answer: 'life is mysterious',
     })
-    .expect(200)
+    .expect(403)
     .end(done);
   });
 });

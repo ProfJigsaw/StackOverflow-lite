@@ -64,6 +64,7 @@
     "express": "^4.16.3",
     "express-api-versioning": "^2.0.0",
     "gemfile": "^1.0.0",
+    "jsonwebtoken": "^8.3.0",
     "pg": "^7.4.3"
   },
   "devDependencies": {
