@@ -122,25 +122,52 @@ describe('API URL VERSION 1 TEST:', () => {
 });
 
 describe('API URL VERSION 1 Endpoints TESTS', () => {
-  it('it should get the total questions', (done) => {
+  it('it should sign user up successfully', (done) => {
+    request(server)
+      .post('/api/v1/auth/signup')
+      .send({
+        username: 'victor',
+        email: 'myman@gmail.com',
+        password: 'pasword',
+      })
+      .expect(200);
+      done();
+  });
+  it('it should log user in successfully', (done) => {
+    request(server)
+      .post('/api/v1/auth/login')
+      .send({
+        username: 'victor',
+        password: 'pasword',
+      })
+      .expect(200);
+      done();
+  });
+  it('it should sign user out successfully', (done) => {
+    request(server)
+      .get('/api/v1/auth/signout')
+      .expect(200)
+      .end(done);
+  });
+  it('it should return a forbidden status when accessing questions without auth', (done) => {
     request(server)
     .get('/api/v1/questions')
     .expect(403)
     .end(done);
   });
-  it('it should get the specified question successfully', (done) => {
+  it('it should return a forbidden status in trying to get specific question', (done) => {
     request(server)
     .get('/api/v1/questions/2')
     .expect(403)
     .end(done);
   });
-  it('it should result in forbidden http status', (done) => {
+  it('it should return a forbidden status', (done) => {
     request(server)
     .get('/api/v1/auth/users')
     .expect(403)
     .end(done);
   });
-  it('it should post a question successfully', (done) => {
+  it('it should return a forbidden status for unauthorized posts', (done) => {
     request(server)
     .post('/api/v1/questions')
     .send({
@@ -151,7 +178,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
     .expect(403)
     .end(done);
   });
-  it('it should post answer successfully', (done) => {
+  it('it should return a forbidden status for unauthorized answer post', (done) => {
     request(server)
     .post('/api/v1/questions/1/answers')
     .send({
@@ -161,5 +188,23 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
     })
     .expect(403)
     .end(done);
+  });
+  it('Unauthorized users should not be able to delete question', (done) => {
+    request(server)
+      .delete('/api/v1/questions/1')
+      .send({
+        userId: 2,
+      })
+      .expect(403)
+      .end(done);
+  });
+  it('Unauthorized users should not be able to accept an answer', (done) => {
+    request(server)
+      .put('/api/v1/questions/1/answers/3')
+      .send({
+        userId: 2,
+      })
+      .expect(403)
+      .end(done);
   });
 });
