@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import express from 'express';
 import pg from 'pg';
 
@@ -11,18 +12,59 @@ const pool = new pg.Pool({
   ssl: true,
 });
 
+function verifyToken(req, res, next) {
+  const bearHeader = req.headers.authorization;
+  if (bearHeader) {
+    [, req.token] = bearHeader.split(' ');
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
+
+router.post('/login', (req, res) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.send('error fetching client from pool', err);
+    }
+    jwt.sign({
+      user: {
+        username: req.body.username,
+      },
+    }, 'elbicnivnisiwasgij', (error, token) => {
+      client.query('SELECT * FROM users WHERE username=$1 AND password=$2', [
+        req.body.username,
+        req.body.password,
+      ], (errors, result) => {
+        if (result.rows.length === 1) {
+          res.send(`User logged in successfully. Token is: ${token}`);
+        } else {
+          res.send('User was not found!');
+        }
+      });
+    });
+    done();
+  });
+});
+
 router.post('/signup', (req, res) => {
   pool.connect((err, client, done) => {
     if (err) {
       return res.send('error fetching client from pool', err);
     }
-    client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
-      req.body.username,
-      req.body.email,
-      req.body.password,
-    ]);
+    jwt.sign({
+      user: {
+        username: req.body.username,
+      },
+    }, 'elbicnivnisiwasgij', (error, token) => {
+      client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
+        req.body.username,
+        req.body.email,
+        req.body.password,
+      ]);
+      res.send(`User created successfully. Token is: ${token}`);
+    });
     done();
-    res.send('User created successfully');
   });
 });
 
@@ -30,18 +72,24 @@ router.get('/signout', (req, res) => {
   res.send('You have bee successfully signed out of the platform.');
 });
 
-router.get('/users', (req, res) => {
-  pool.connect((err, client, done) => {
-    if (err) {
-      return res.send('error fetching client from pool', err);
+router.get('/users', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.send('Error fetching client from pool', err);
+        }
+        client.query('SELECT * FROM users', (errorbug, result) => {
+          if (errorbug) {
+            res.send(errorbug);
+          }
+          res.send(result.rows);
+        });
+        done();
+      });
     }
-    client.query('SELECT * FROM users', (error, result) => {
-      if (error) {
-        res.send(error);
-      }
-      res.send(result.rows);
-    });
-    done();
   });
 });
 
