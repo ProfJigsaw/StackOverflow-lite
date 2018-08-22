@@ -1,10 +1,19 @@
 import express from 'express';
+import pg from 'pg';
 import dbpackage from '../model/dbstruct';
 import generateUniqueId from '../helpers/genUniqueId';
 import mode from '../helpers/mode';
 
 const router = express.Router();
 let { questions, answers } = dbpackage;
+const pool = new pg.Pool({
+  host: 'ec2-54-235-242-63.compute-1.amazonaws.com',
+  user: 'qioqlpbhbvemko',
+  database: 'd7asd2ddssh50j',
+  password: '7f7c24035097e34629a30dbffb67ca3ba37e9296fd91258f8b7eb6ff02dba8d0',
+  port: 5432,
+  ssl: true,
+});
 
 router.get('/', (req, res) => {
   res.json(questions);
@@ -59,13 +68,18 @@ router.post('/findQuestionById', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  questions.unshift({
-    questionId: Number(generateUniqueId(questions, 'questionId')),
-    userId: Number(req.body.userId),
-    username: req.body.username,
-    question: req.body.question,
+  pool.connect((err, client, done) => {
+    if (err) {
+      return console.error('error fetching client from pool', err);
+    }
+    client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
+      Number(req.body.userId),
+      req.body.username,
+      req.body.question,
+    ]);
+    done();
+    res.send('Successfully inserted data into heroku postgres!');
   });
-  res.json(questions);
 });
 
 router.post('/:id/answers', (req, res) => {
