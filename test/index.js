@@ -125,13 +125,13 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
   it('it should get the total questions', (done) => {
     request(server)
     .get('/api/v1/questions')
-    .expect(404)
+    .expect(403)
     .end(done);
   });
   it('it should get the specified question successfully', (done) => {
     request(server)
     .get('/api/v1/questions/2')
-    .expect(404)
+    .expect(403)
     .end(done);
   });
   it('it should result in forbidden http status', (done) => {
