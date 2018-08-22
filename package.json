@@ -20,6 +20,7 @@
     "exclude": [
       "**/controllers/**",
       "**/model/**",
+      "**/middleware/**",
       "**/dist/**",
       "client"
     ],
