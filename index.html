@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
         <link rel="shortcut icon" href="./assets/picture1.png">
         <title>StackOverflow-Lite</title>
-        <link rel="stylesheet" href="./css/style.css">
+        <link rel="stylesheet" href="./css/gueststyle.css">
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
     </head>
+
     <body>
         <div id="container">
             <div id="title-bar">
@@ -14,58 +16,33 @@
                     <img src="./assets/picture1.png" alt="" id="logo">
                     <a class="siteName" href="./index.html">StackOverflow-Lite</a>
                 </div>
-                <div class="search-box">
-                    <form method="post" action="#"name="SearchForm">
-                        <input id="search-input" type="text" name="keyword" placeholder="Find Question..." />
-                    </form>
-                </div>
-                <div id="profile">
-                    <a href="./userprofile.html">View Profile</a>
-                    <a href="./guestindex.html">Logout</a>
+                <div id="home-about">
+                    <a href="./user.html">User</a> <a href="#">About</a>
                 </div>
             </div>
             <div id="main-content-area">
-                .
-                <div id="feature-panel">
-                    <fieldset>
-                        <legend> FEATURES</legend>
-                        <div id="features">
-                            <a href="./index.html">Home</a>
-                            <br>
-                            <a href="./questions.html">View all questions asked</a>
-                            <br>
-                            
-                            <form action="#" method="#">
-                                <p>Search by Id:</p>
-                                <input type="text" placeholer="Enter question Id" name="qid" /><br>
-                                <input type="submit" value="Find Question" name="submit" />
-                            </form>
-                            <br>
-                            <div>
-                                <a href="./questions.html">Recently asked questions</a>
-                                <br>
-                                <a href="./addquestion.html"> Add a Question</a>
-                            </div>
+                <div id="guest-container">
+                    <div id="main-content-container">
+                        <h1>Hello, <span id="hello">Guest</span>!</h1>
+                        <h2 id="main-header"> Welcome to, StackOverFlow Lite</h2>
+                        <br />
+                        <h3>
+                            STACK TIP
+                        </h3>
+                        <i>
+                            This is a platform for asking useful questions on any aspect of life and getting feedback from others on the platform.
+                            <br> To ask a question, you must create an account by signing up if you do not have an account or log into your account.
+                            Use the links below as needed.
+                        </i><br/>
+                        <div id="login">
+                            <a href="./login.html">Login</a> <a href="./signup.html">Sign Up</a>
                         </div>
-                    </fieldset>
-                </div>
-                <div id="main-content-container">
-                    <h1>Hello, <span id="hello">Kevin</span>!</h1>
-                    <h2 id="main-header"> Welcome to, StackOverFlow Lite</h2>
-                    <br />
-                    <h3>
-                        STACK TIP    
-                    </h3>
-                    <i>
-                        This is a platform for asking useful questions on any aspect of life and getting feedback from others on the platform.
-                        <p>To the left of the screen are options for navigating your page, at the top right 
-                            hand corner of the page are buttons to view your profile and account information and to logout. </p>
-                    </i>
+                    </div>
                 </div>
             </div>
         </div>
         <div id="footer">
-            &copy; Copyright 2018. StackOverflow-Lite.heroku.com
+            &copy; Copyright 2018. <a href="https://nweze-stackoverflow.herokuapp.com/">stackoverflow-Lite</a>
         </div>
         <script src="#"></script>
     </body>

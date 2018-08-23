@@ -1,0 +1,246 @@
+html, body{
+	margin: 0;
+	padding: 0;
+  height: auto;
+  font-family: 'Ubuntu', sans-serif;
+	background: url(../assets/questionbg3.jpg) no-repeat center center fixed;
+}
+#container {
+	width: 100%;
+	height: auto;
+	opacity: 0.97;
+}
+#container div {
+	display: block;
+}
+
+h2{
+  line-height: 1.2em;
+}
+
+#title-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	padding-top: 8px;
+	z-index: 9999;
+	width: 100%;
+	height: 60px;
+	background: url(../assets/bg3.jpg) repeat;
+}
+#hello{
+	letter-spacing: 0.2em;
+	font-weight: bold;
+	text-decoration: underline;
+	color: rgba(255, 234, 0, 0.87);
+}
+.logo-name {
+	padding-top: 5px;
+	width: 40%;
+	height: 50px;
+	float: left;
+	font-size: 18px;
+	letter-spacing: 0.2em;
+	padding-left: 10px;
+	font-family: 'Pacifico', cursive;
+	font-size: 16px;
+	font-weight: bold;
+	color: rgba(255, 234, 245, 0.9);
+}
+.siteName{
+	left: -10px;
+	font-family: 'Pacifico', cursive;
+	font-size: 24px;
+	font-weight: bold;
+	text-decoration: none;
+	color: rgba(255, 234, 245, 0.9);
+}
+.siteName:visited{
+	color: rgba(255, 234, 245, 0.9);
+}
+#logo{
+	width: 35px;
+	height: 35px;
+}
+.search-box {
+	width: 20%;
+	height: 50px;
+	float: left;
+}
+#home-about{
+  float: right;
+	width: 30%;
+	height: 50px;
+	font-size: 20px;
+	font-weight: bold;
+	letter-spacing: 0em;
+  color: white;
+  padding: 3px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+#home-about a{
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: rgba(255, 234, 0, 0.87);
+  text-decoration: none;
+  margin-right: 4%;
+}
+
+#login{
+  margin: 30px 33%;
+	width: 80%;
+	height: 50px;
+	font-size: 20px;
+	font-weight: bold;
+	letter-spacing: 0em;
+  color: white;
+  padding: 3px;
+  border-radius: 4px;
+  
+}
+#login a{
+  text-decoration: none;
+  color: white;
+  width: auto;
+  height: auto;
+  border: 2px #000 solid;
+  padding: 3px;
+  border-radius: 4px;
+  margin-left: 20px;
+  background: url(../assets/bg3.jpg) repeat;
+}
+#login a:visited, #profile a:visited{
+	color: white;
+}
+#loginformheader{
+	margin: 15px 23%;
+  font-size: 24px;
+  font-family: 'Ubuntu', sans-serif;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 3px;
+  border-radius: 4px;
+}
+#loginform, #signupform{
+	margin: 40px 33%;
+	width: 400px;
+	height: auto;
+	background-color: rgb(46, 98, 116);
+	padding: 10px;
+  border: 3px #ccc solid;
+  font-family: 'Ubuntu', sans-serif;
+	border-radius: 5px;
+}
+#loginform input, #signupform input{
+  margin-left: 100px;
+  margin-bottom: 0px;  
+	width: 200px;
+	height: 30px;
+	border-bottom: 2px black solid;
+	font-size: 18px;
+}
+#loginform p, #signupform p{
+  font-family: 'Ubuntu', sans-serif;
+  color: white;
+}
+#submit{
+	margin: 10px 33%;
+	width: 150px;
+	height: 40px;
+	border-radius: 15px;
+	font-size: 24px;
+}
+#loginform p, #signupform p{
+	margin: 5px 100px;
+  font-size: 18px;
+  font-family: 'Ubuntu', sans-serif;
+}
+#loginform a, #signupform a{
+  color: rgba(255, 234, 0, 0.87);
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 3px;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-left: 20%;
+}
+.user-image{
+	width: 24px;
+	height: 24px;
+	margin-top: 4px;
+}
+
+#main-content-area {
+	padding-top: 63px;
+	height: 1100px;
+	width: 100%;
+	background: rgba(0,0,0,0.3);
+	/*
+	overflow: scroll;*/
+}
+#guest-container{
+	margin: 50px 0;
+	background-color: #008CBA;
+	opacity: 1;
+}
+#main-content-container {
+  color: white;
+  font-family: 'Ubuntu', sans-serif;
+	font-weight: normal;
+	line-height: 1.1em;
+	margin-left: 10%;
+	padding: 10px;
+	border-radius: 15px;
+	float: left;
+	width: 70%;
+  height: auto;
+  opacity: 0.6;
+  background-color: black;
+}
+
+#footer {
+	position: fixed;
+	height: 30px;
+	width: 100%;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+	background: url(../assets/bg3.jpg) repeat;
+	text-align: center;
+  z-index: 9999;
+  color: white;
+}
+#footer a{
+  color: white;
+}
+#footer a:visited{
+  color: white;
+}
+
+#add-comment-handle{
+
+}
+@media only screen and (max-width: 800px) {
+		.logo-name {
+			font-size: 0px;
+		}
+		.logo-name a{
+			font-size: 0px;
+		}
+		#login {
+			top: -20px;
+			width: 60%;
+			height: 50px;
+			float: right;
+			font-size: 18px;
+			font-weight: bold;
+			left: 50px;
+    }
+    #home-about{
+      float: left;
+      margin-left: -30%;
+      width: 60%;
+    }
+}

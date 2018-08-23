@@ -4,7 +4,7 @@
         <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
         <link rel="shortcut icon" href="./assets/picture1.png">
         <title>StackOverflow-Lite</title>
-        <link rel="stylesheet" href="./css/style.css">
+        <link rel="stylesheet" href="./css/gueststyle.css">
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
     </head>
     <body>
@@ -12,44 +12,33 @@
             <div id="title-bar">
                 <div class="logo-name">
                     <img src="./assets/picture1.png" alt="" id="logo">
-                    <a class="siteName" href="./guestindex.html">StackOverflow-Lite</a>
+                    <a class="siteName" href="./index.html">StackOverflow-Lite</a>
                 </div>
-                <div id="login">
-                    <a href="./signup.html">Sign Up</a>
+                <div id="home-about">
+                    <a href="./user.html">User</a> <a href="#">About</a>
                 </div>
             </div>
             <div id="main-content-area">
-                .
-                <div id="feature-panel">
-                    <h3>INFO:</h3>
-                    <p id="plain-features">
-                        Join StackOverflow-Lite today<br><br>
-                        Create a free account <br><br> 
-                        Ask, answer and comment on questions!
-                    </p>
-                </div>
-                <div id="main-content-container">
                     <div id="loginform">
                         <h3 id="loginformheader">Login Form</h3>
                         <form action="#" method="post">
-                            <label>Enter Username:
-                                <br>
-                                <input type="text" name="username" id="username" placeholder="Enter your username" />
-                            </label>
+                            <p>Enter Username:</p>
+                            <input type="text" name="username" id="username" placeholder="Username..." />
                             <br>
-                            <label>Enter Password:
-                                <br>
-                                <input type="password" name="password" id="password" placeholder="Enter password" />
-                            </label>
                             <br>
-                            <input type="submit" value="Log In" name="submit" id="submit">
+                            <p>Enter Password:</p>
+                            <input type="password" name="password" id="password" placeholder="Password..." />
+                            <br>
+                            <button type="submit" name="submit" id="submit">Login</button>
+                            <p>
+                            Dont have an account? <a href="./signup.html">Create one</a>
+                            </p>
                         </form>
-                    </div>  
-                </div>
+                    </div> 
             </div>
         </div>
         <div id="footer">
-            &copy; Copyright 2018. StackOverflow-Lite.heroku.com
+            &copy; Copyright 2018. <a href="https://nweze-stackoverflow.herokuapp.com/">stackoverflow-Lite</a>
         </div>
         <script src="#"></script>
     </body>
