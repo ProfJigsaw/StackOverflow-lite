@@ -57,12 +57,18 @@ router.post('/signup', (req, res) => {
         username: req.body.username,
       },
     }, 'elbicnivnisiwasgij', (error, token) => {
-      client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
-        req.body.username,
-        req.body.email,
-        req.body.password,
-      ]);
-      res.send(`User created successfully. Token is: ${token}`);
+
+      client.query('SELECT * FROM users WHERE username=$1', [req.body.username], (error, result) => {
+        if (result.rows.length > 0) {
+          return res.send('This username already exists, Please select another username');
+        }
+        client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
+          req.body.username,
+          req.body.email,
+          req.body.password,
+        ]);
+        res.send(`User created successfully. Token is: ${token}`);
+      });
     });
     done();
   });
