@@ -90,7 +90,7 @@ h2{
 
 #login{
   margin: 30px 33%;
-	width: 80%;
+	width: 30%;
 	height: 50px;
 	font-size: 20px;
 	font-weight: bold;
@@ -142,6 +142,8 @@ h2{
 	font-size: 18px;
 }
 #loginform p, #signupform p{
+	margin: 5px 100px;
+  font-size: 18px;
   font-family: 'Ubuntu', sans-serif;
   color: white;
 }
@@ -151,11 +153,6 @@ h2{
 	height: 40px;
 	border-radius: 15px;
 	font-size: 24px;
-}
-#loginform p, #signupform p{
-	margin: 5px 100px;
-  font-size: 18px;
-  font-family: 'Ubuntu', sans-serif;
 }
 #loginform a, #signupform a{
   color: rgba(255, 234, 0, 0.87);
@@ -231,16 +228,37 @@ h2{
 		}
 		#login {
 			top: -20px;
-			width: 60%;
+			width: 80%;
 			height: 50px;
-			float: right;
+			margin-left: 30px;
 			font-size: 18px;
 			font-weight: bold;
-			left: 50px;
     }
     #home-about{
       float: left;
       margin-left: -30%;
       width: 60%;
-    }
+		}
+		#loginform, #signupform{
+			margin: 40px 0;
+			height: auto;
+			background-color: rgb(46, 98, 116);
+			padding: 10px;
+			border: 3px #ccc solid;
+			font-family: 'Ubuntu', sans-serif;
+			border-radius: 5px;
+		}
+		#loginformheader{
+			margin: 15px 10%;
+			width: 40%;
+		}
+		#loginform input, #signupform input{
+			margin-left: 30px;
+		}
+		#loginform p, #signupform p{
+			margin-left: 30px;
+		}
+		#submit{
+			margin: 10px 10%;
+		}
 }

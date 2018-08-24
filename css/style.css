@@ -32,7 +32,7 @@ html, body{
 }
 .logo-name {
 	padding-top: 5px;
-	width: 40%;
+	width: 30%;
 	height: 50px;
 	float: left;
 	font-size: 18px;
@@ -461,16 +461,16 @@ strong#username{
 		.search-box {
 			width: 20%;
 			height: 50px;
-			margin-left: -30%;
+			margin-left: -20%;
 		}
 		#profile {
 			top: -20px;
-			width: 50%;
+			width: 65%;
 			height: 50px;
-			float: right;
+			float: left;
 			font-size: 18px;
 			font-weight: bold;
-			left: -50px;
+			left: -70px;
 		}
 		#user-info{
 			width: 50%;
