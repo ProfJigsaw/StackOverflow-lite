@@ -21,6 +21,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/api-docs', (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/doc.html'));
+});
+
 app.use(expressApiVersioning({
   apiPath: path.join(__dirname, './api'),
   test: /\/api\/(v[0-9]+).*/,
