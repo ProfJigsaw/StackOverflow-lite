@@ -1,14 +1,17 @@
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import pg from 'pg';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express();
 const pool = new pg.Pool({
-  host: 'ec2-54-235-242-63.compute-1.amazonaws.com',
-  user: 'qioqlpbhbvemko',
-  database: 'd7asd2ddssh50j',
-  password: '7f7c24035097e34629a30dbffb67ca3ba37e9296fd91258f8b7eb6ff02dba8d0',
-  port: 5432,
+  host: process.env.POSTGRES_AWS_HOST,
+  user: process.env.POSTGRES_USER,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT,
   ssl: true,
 });
 
@@ -23,41 +26,51 @@ function verifyToken(req, res, next) {
 }
 
 router.post('/login', (req, res) => {
+  if (!req.body.username || !req.body.password) {
+    return res.send('Your entry contains a missing field.');
+  }
   pool.connect((err, client, done) => {
     if (err) {
       return res.send('error fetching client from pool', err);
     }
-    jwt.sign({
-      user: {
-        username: req.body.username,
-      },
-    }, 'elbicnivnisiwasgij', (error, token) => {
-      client.query('SELECT * FROM users WHERE username=$1 AND password=$2', [
+    client.query('SELECT userid, username FROM users WHERE username=$1 AND password=$2', [
         req.body.username,
         req.body.password,
       ], (errors, result) => {
         if (result.rows.length === 1) {
-          res.send(`User logged in successfully. Token is: ${token}`);
+          const authUser = result.rows[0];
+          jwt.sign({
+            authUser,
+          }, process.env.JWT_SECRET_KEY, (jwerror, jwtoken) => {
+            if (jwerror) {
+              res.send('An error occured');
+            }
+            res.send(`User logged in successfully. Token is: ${jwtoken}`);
+          });
         } else {
           res.send('User was not found!');
         }
       });
-    });
     done();
   });
 });
 
-router.post('/signup', (req, res) => {
-  pool.connect((err, client, done) => {
-    if (err) {
-      return res.send('error fetching client from pool', err);
-    }
-    jwt.sign({
-      user: {
-        username: req.body.username,
-      },
-    }, 'elbicnivnisiwasgij', (error, token) => {
+const testEmail = (email) => {
+  const emailregex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+  return emailregex.test(email);
+};
 
+router.post('/signup', (req, res) => {
+  if (!req.body.username.trim() || !req.body.email.trim() || !req.body.password.trim()) {
+    return res.send('Your entry contains a missing field.');
+  }
+  if (!testEmail(req.body.email)) {
+    return res.send('The email that you entered is invalid');
+  }
+    pool.connect((err, client, done) => {
+      if (err) {
+        return res.send('error fetching client from pool', err);
+      }
       client.query('SELECT * FROM users WHERE username=$1', [req.body.username], (error, result) => {
         if (result.rows.length > 0) {
           return res.send('This username already exists, Please select another username');
@@ -67,15 +80,24 @@ router.post('/signup', (req, res) => {
           req.body.email,
           req.body.password,
         ]);
-        res.send(`User created successfully. Token is: ${token}`);
+        client.query('SELECT userid, username FROM users WHERE username=$1', [req.body.username], (err, result) => {
+          const authUser = result.rows[0];
+          jwt.sign({
+            authUser,
+          }, process.env.JWT_SECRET_KEY, (jwterror, jwtoken) => {
+            if (jwterror) {
+              return res.send('There was an error', err);
+            }
+            return res.send(`User created successfully. Your token is ${jwtoken}`);
+          });
+        });
       });
+      done();
     });
-    done();
-  });
 });
 
 router.get('/signout', (req, res) => {
-  res.send('You have bee successfully signed out of the platform.');
+  res.send('You have been successfully signed out of the platform.');
 });
 
 router.get('/users', verifyToken, (req, res) => {
