@@ -5,14 +5,16 @@ import dbpackage from '../model/dbstruct';
 import generateUniqueId from '../helpers/genUniqueId';
 import mode from '../helpers/mode';
 
+require('dotenv').config();
+
 const router = express.Router();
 const { questions, answers } = dbpackage;
 const pool = new pg.Pool({
-  host: 'ec2-54-235-242-63.compute-1.amazonaws.com',
-  user: 'qioqlpbhbvemko',
-  database: 'd7asd2ddssh50j',
-  password: '7f7c24035097e34629a30dbffb67ca3ba37e9296fd91258f8b7eb6ff02dba8d0',
-  port: 5432,
+  host: process.env.POSTGRES_AWS_HOST,
+  user: process.env.POSTGRES_USER,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT,
   ssl: true,
 });
 
@@ -27,7 +29,7 @@ function verifyToken(req, res, next) {
 }
 
 router.get('/', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -45,7 +47,7 @@ router.get('/', verifyToken, (req, res) => {
 });
 
 router.get('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -102,66 +104,70 @@ router.post('/findQuestionById', (req, res) => {
 });
 
 router.post('/', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
-    if (error) {
-      res.sendStatus(403);
-    } else {
-      pool.connect((err, client, done) => {
-        if (err) {
-          return res.send('error fetching client from pool', err);
-        }
-        client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
-          Number(req.body.userId),
-          req.body.username,
-          req.body.question,
-        ]);
-        done();
-        res.send('Successfully inserted data into heroku postgres Database!');
-      });
-    }
-  });
+  if (!req.body.question) {
+    res.send('No question was entered');
+  } else {
+    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+      if (error) {
+        res.sendStatus(403);
+      } else {
+        pool.connect((err, client, done) => {
+          if (err) {
+            return res.send('Error fetching client from pool', err);
+          }
+          client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
+            Number(userData.authUser.userid),
+            userData.authUser.username,
+            req.body.question,
+          ]);
+          done();
+          res.send('Successfully inserted data into heroku postgres Database!');
+        });
+      }
+    });
+  }
 });
 
 router.post('/:id/answers', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
-    if (error) {
-      res.sendStatus(403);
-    } else {
-      pool.connect((err, client, done) => {
-        if (err) {
-          return res.send('error fetching client from pool', err);
-        }
-        client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
-          req.params.id,
-          req.body.userId,
-          req.body.username,
-          req.body.answer,
-          0,
-          0,
-          0,
-        ]);
-        done();
-        res.send('Successfully inserted answer into heroku postgres DB!');
-      });
-    }
-  });
+  if (!req.body.answer) {
+    res.send('No answer was sent');
+  } else {
+    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+      if (error) {
+        res.sendStatus(403);
+      } else {
+        pool.connect((err, client, done) => {
+          if (err) {
+            return res.send('error fetching client from pool', err);
+          }
+          client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
+            req.params.id,
+            userData.authUser.userid,
+            userData.authUser.username,
+            req.body.answer,
+            0,
+            0,
+            0,
+          ]);
+          done();
+          res.send('Successfully inserted answer into Heroku postgres DB!');
+        });
+      }
+    });
+  }
 });
 
 router.delete('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
       res.sendStatus(403);
     } else {
       const questId = Number(req.params.id);
-      const { userId } = req.body;
-      if (!userId) {
-        return res.send('You must send along your user Id');
-      }
       pool.connect((err, client, done) => {
         if (err) {
           return res.send('Error fetching client from pool', err);
         }
-        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userId], (error, result) => {
+        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
             res.send(error);
           } if (result.rows.length === 0) {
@@ -178,18 +184,18 @@ router.delete('/:id', verifyToken, (req, res) => {
 });
 
 router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+    console.log(userData.authUser.userid);
     if (error) {
       res.sendStatus(403);
     } else {
       const questId = Number(req.params.qId);
       const answerId = Number(req.params.aId);
-      const uId = req.body.userId;
       pool.connect((err, client, done) => {
         if (err) {
           return res.send('error fetching client from pool', err);
         }
-        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, uId], (error, result) => {
+        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
             return res.send(error);
           } if (result.rows.length === 0) {
