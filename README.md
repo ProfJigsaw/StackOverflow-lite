@@ -48,11 +48,14 @@ Once the installation is complete, we run the start script as follows:
 
 > npm start
 
+
 This runs the following script on the background processes;
 
 ```
 nodemon app.js --exec babel-node --presets babel-preset-es2015
 ```
+
+This command starts the dev server on port 8080.
 
 ## Running the tests
 
@@ -69,7 +72,7 @@ cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --compilers js
 
 ## Deployment
 
-This app is deployed on the popular hosting cloud platform [heroku](https://heroku.com). The app can be visited on [nweze-stackoverflow](https://nweze-stackoverflow.herokuapp.com).
+This app is deployed on the popular hosting cloud platform [heroku](https://heroku.com). The app can be visited on [nvc-stackqa](https://nvc-stackqa.herokuapp.com/).
 
 
 ## Versioning
