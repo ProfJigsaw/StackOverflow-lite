@@ -31,7 +31,7 @@ router.post('/login', (req, res) => {
   }
   pool.connect((err, client, done) => {
     if (err) {
-      return res.send('error fetching client from pool', err);
+      return res.status(200).send('error fetching client from pool', err);
     }
     client.query('SELECT userid, username FROM users WHERE username=$1 AND password=$2', [
         req.body.username,
@@ -48,8 +48,9 @@ router.post('/login', (req, res) => {
             res.send(`User logged in successfully. Token is: ${jwtoken}`);
           });
         } else {
-          res.send('User was not found!');
+          res.status(200).send('User was not found!');
         }
+        client.end();
       });
     done();
   });
@@ -62,34 +63,39 @@ const testEmail = (email) => {
 
 router.post('/signup', (req, res) => {
   if (!req.body.username.trim() || !req.body.email.trim() || !req.body.password.trim()) {
-    return res.send('Your entry contains a missing field.');
+    return res.status(200).send('Your entry contains a missing field.');
   }
   if (!testEmail(req.body.email)) {
-    return res.send('The email that you entered is invalid');
+    return res.status(200).send('The email that you entered is invalid');
   }
     pool.connect((err, client, done) => {
       if (err) {
-        return res.send('error fetching client from pool', err);
+        return res.status(200).send('error fetching client from pool', err);
       }
       client.query('SELECT * FROM users WHERE username=$1', [req.body.username], (error, result) => {
         if (result.rows.length > 0) {
-          return res.send('This username already exists, Please select another username');
+          return res.status(200).send('This username already exists, Please select another username');
         }
         client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
           req.body.username,
           req.body.email,
           req.body.password,
-        ]);
+        ], (err) => {
+          if (err) {
+            res.status(200).send('An error occured ofter insertion');
+          }
+        });
         client.query('SELECT userid, username FROM users WHERE username=$1', [req.body.username], (err, result) => {
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
           }, process.env.JWT_SECRET_KEY, (jwterror, jwtoken) => {
             if (jwterror) {
-              return res.send('There was an error', err);
+              return res.status(200).send('There was an error', err);
             }
-            return res.send(`User created successfully. Your token is ${jwtoken}`);
+            return res.status(200).send(`User created successfully. Your token is ${jwtoken}`);
           });
+          client.end();
         });
       });
       done();
@@ -97,7 +103,7 @@ router.post('/signup', (req, res) => {
 });
 
 router.get('/signout', (req, res) => {
-  res.send('You have been successfully signed out of the platform.');
+  res.status(200).send('You have been successfully signed out of the platform.');
 });
 
 router.get('/users', verifyToken, (req, res) => {
@@ -107,13 +113,14 @@ router.get('/users', verifyToken, (req, res) => {
     } else {
       pool.connect((err, client, done) => {
         if (err) {
-          return res.send('Error fetching client from pool', err);
+          return res.status(200).send('Error fetching client from pool', err);
         }
         client.query('SELECT * FROM users', (errorbug, result) => {
           if (errorbug) {
             res.send(errorbug);
           }
-          res.send(result.rows);
+          res.status(200).send(result.rows);
+          client.end();
         });
         done();
       });
