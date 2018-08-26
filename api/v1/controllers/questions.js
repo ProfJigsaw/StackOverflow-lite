@@ -29,7 +29,7 @@ function verifyToken(req, res, next) {
 }
 
 router.get('/', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -47,7 +47,7 @@ router.get('/', verifyToken, (req, res) => {
 });
 
 router.get('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -107,7 +107,7 @@ router.post('/', verifyToken, (req, res) => {
   if (!req.body.question) {
     res.send('No question was entered');
   } else {
-    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+    jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
       if (error) {
         res.sendStatus(403);
       } else {
@@ -132,7 +132,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
   if (!req.body.answer) {
     res.send('No answer was sent');
   } else {
-    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+    jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
       if (error) {
         res.sendStatus(403);
       } else {
@@ -158,7 +158,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
 });
 
 router.delete('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -184,7 +184,7 @@ router.delete('/:id', verifyToken, (req, res) => {
 });
 
 router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
     console.log(userData.authUser.userid);
     if (error) {
       res.sendStatus(403);
