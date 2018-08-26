@@ -43,7 +43,7 @@ router.post('/login', (req, res) => {
         req.body.username,
         req.body.password,
       ], (errors, result) => {
-        if (result.rows.length) {
+        if (result) {
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
