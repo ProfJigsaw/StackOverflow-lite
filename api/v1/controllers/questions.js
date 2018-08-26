@@ -10,11 +10,11 @@ require('dotenv').config();
 const router = express.Router();
 const { questions, answers } = dbpackage;
 const pool = new pg.Pool({
-  host: process.env.POSTGRES_AWS_HOST,
-  user: process.env.POSTGRES_USER,
-  database: process.env.POSTGRES_DATABASE,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT,
+  host: 'ec2-54-163-246-5.compute-1.amazonaws.com',
+  user: 'kykzfypdroonqq',
+  database: 'dbce24mref102i',
+  password: 'bad3fc10cb046ef90a7bfa47eb4626a5900d498d69801a83ea6395ed15cff8ae',
+  port: 5432,
   ssl: true,
 });
 

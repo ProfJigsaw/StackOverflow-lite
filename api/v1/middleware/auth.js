@@ -7,10 +7,10 @@ dotenv.config();
 
 const router = express();
 const pool = new pg.Pool({
-  host: 'ec2-174-129-236-147.compute-1.amazonaws.com',
-  user: 'mdkqqwvjvakjla',
-  database: 'd9e62da97bf5d0',
-  password: '4e0d9154f602a1bfc74dcbcf4efb9afc3ce9f54506bcad584cea354ca8e95d15',
+  host: 'ec2-54-163-246-5.compute-1.amazonaws.com',
+  user: 'kykzfypdroonqq',
+  database: 'dbce24mref102i',
+  password: 'bad3fc10cb046ef90a7bfa47eb4626a5900d498d69801a83ea6395ed15cff8ae',
   port: 5432,
   ssl: true,
 });
