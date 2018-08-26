@@ -43,7 +43,7 @@ router.post('/login', (req, res) => {
             authUser,
           }, process.env.JWT_SECRET_KEY, (jwerror, jwtoken) => {
             if (jwerror) {
-              res.send('An error occured');
+              return res.send('An error occured');
             }
             res.send(`User logged in successfully. Token is: ${jwtoken}`);
           });
@@ -62,8 +62,11 @@ const testEmail = (email) => {
 };
 
 router.post('/signup', (req, res) => {
-  if (!req.body.username.trim() || !req.body.email.trim() || !req.body.password.trim()) {
+  if (!req.body.username || !req.body.email || !req.body.password) {
     return res.status(200).send('Your entry contains a missing field.');
+  }
+  if (!req.body.username.trim() || !req.body.email.trim() || !req.body.password.trim()) {
+    return res.status(200).send('One of your entries is empty.');
   }
   if (!testEmail(req.body.email)) {
     return res.status(200).send('The email that you entered is invalid');
@@ -73,29 +76,29 @@ router.post('/signup', (req, res) => {
         return res.status(200).send('error fetching client from pool', err);
       }
       client.query('SELECT * FROM users WHERE username=$1', [req.body.username], (error, result) => {
-        if (result.rows.length > 0) {
+        if (result.rows.length) {
           return res.status(200).send('This username already exists, Please select another username');
         }
-        client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
-          req.body.username,
-          req.body.email,
-          req.body.password,
-        ], (err) => {
-          if (err) {
-            res.status(200).send('An error occured ofter insertion');
+      });
+      // end of select
+      done();
+    });
+
+    pool.connect((error, client, done) => {
+      client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
+        req.body.username,
+        req.body.email,
+        req.body.password,
+      ]);
+      client.query('SELECT userid, username FROM users WHERE username=$1', [req.body.username], (err, result) => {
+        const authUser = result.rows[0];
+        jwt.sign({
+          authUser,
+        }, process.env.JWT_SECRET_KEY, (jwterror, jwtoken) => {
+          if (jwterror) {
+            return res.status(200).send('There was an error', err);
           }
-        });
-        client.query('SELECT userid, username FROM users WHERE username=$1', [req.body.username], (err, result) => {
-          const authUser = result.rows[0];
-          jwt.sign({
-            authUser,
-          }, process.env.JWT_SECRET_KEY, (jwterror, jwtoken) => {
-            if (jwterror) {
-              return res.status(200).send('There was an error', err);
-            }
-            return res.status(200).send(`User created successfully. Your token is ${jwtoken}`);
-          });
-          client.end();
+          return res.status(200).send(`User created successfully. Your token is ${jwtoken}`);
         });
       });
       done();
