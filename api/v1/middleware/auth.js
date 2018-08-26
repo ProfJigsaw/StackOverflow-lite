@@ -41,7 +41,7 @@ router.post('/login', (req, res) => {
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
-          }, process.env.JWT_SECRET_KEY, (jwerror, jwtoken) => {
+          }, 'elbicnivnisiwasgij', (jwerror, jwtoken) => {
             if (jwerror) {
               return res.send('An error occured');
             }
@@ -94,7 +94,7 @@ router.post('/signup', (req, res) => {
         const authUser = result.rows[0];
         jwt.sign({
           authUser,
-        }, process.env.JWT_SECRET_KEY, (jwterror, jwtoken) => {
+        }, 'elbicnivnisiwasgij', (jwterror, jwtoken) => {
           if (jwterror) {
             return res.status(200).send('There was an error', err);
           }
