@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
   res.send(`
   Welcome to StackOverflow-Lite!
   <p>To see the documetation of this API you can either: </p>
-  <p>Follow <a href="/api-docs">this link<a> or Enter the following in the searchbar: <i>nweze-stackoverflow.herokuapp.com/api-docs.</i> </p>
+  <p>Follow <a href="/api-docs">this link</a> or Enter the following in the searchbar: <i>https://nvc-stackqa.herokuapp.com/api-docs.</i> </p>
   `);
 });
 
@@ -24,7 +24,7 @@ router.get('/apidocs', (req, res) => {
       version: '0.1',
     },
     servers: [{
-      url: 'https://nweze-stackoverflow.herokuapp.com',
+      url: 'https://nvc-stackqa.herokuapp.com',
     }],
     paths: {
       '/api/v1/questions/': {
