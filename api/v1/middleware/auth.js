@@ -7,11 +7,11 @@ dotenv.config();
 
 const router = express();
 const pool = new pg.Pool({
-  host: process.env.POSTGRES_AWS_HOST,
-  user: process.env.POSTGRES_USER,
-  database: process.env.POSTGRES_DATABASE,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT,
+  host: 'ec2-174-129-236-147.compute-1.amazonaws.com',
+  user: 'mdkqqwvjvakjla',
+  database: 'd9e62da97bf5d0',
+  password: '4e0d9154f602a1bfc74dcbcf4efb9afc3ce9f54506bcad584cea354ca8e95d15',
+  port: 5432,
   ssl: true,
 });
 
