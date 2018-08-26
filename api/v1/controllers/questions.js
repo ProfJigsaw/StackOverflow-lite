@@ -38,7 +38,11 @@ router.get('/', verifyToken, (req, res) => {
           return res.status(200).send('error fetching client from pool', err);
         }
         client.query('SELECT * FROM questions', (bugFound, result) => {
-          res.status(200).send(result.rows);
+          res.status(200).json({
+            msg: 'All questions retrieved',
+            getstate: true,
+            qstack: result.rows,
+          });
         });
         done();
       });
@@ -65,9 +69,18 @@ router.get('/:id', verifyToken, (req, res) => {
             } else {
               client.query('SELECT * FROM answers WHERE questionid=$1', [id], (errForAns, answers) => {
                 if (answers.rows.length === 0) {
-                  res.status(200).send(['QUESTION:', ...result.rows, 'ANSWERS:', 'There are no answers for this question!']);
+                  res.status(200).json({
+                    msg: 'Specified question retrieved',
+                    getstate: true,
+                    qstack: result.rows,
+                  });
                 } else {
-                  res.status(200).send(['QUESTION:', ...result.rows, 'ANSWERS:', ...answers.rows]);
+                  res.status(200).json({
+                    msg: 'Specified question retrieved',
+                    getstate: true,
+                    qstack: result.rows,
+                    astack: answers.rows,
+                  });
                 }
               });
             }
@@ -121,7 +134,10 @@ router.post('/', verifyToken, (req, res) => {
             req.body.question,
           ]);
           done();
-          res.status(200).send('Successfully inserted data into heroku postgres Database!');
+          res.status(200).json({
+            msg: 'Question posted',
+            poststate: true,
+          });
         });
       }
     });
@@ -150,7 +166,10 @@ router.post('/:id/answers', verifyToken, (req, res) => {
             0,
           ]);
           done();
-          res.status(200).send('Successfully inserted answer into Heroku postgres DB!');
+          res.status(200).json({
+            msg: 'Answer posted',
+            poststate: true,
+          });
         });
       }
     });
@@ -169,12 +188,16 @@ router.delete('/:id', verifyToken, (req, res) => {
         }
         client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
-            res.status(200).send(error);
-          } if (result.rows.length === 0) {
+            return res.status(200).send(error);
+          }
+          if (result.rows.length === 0) {
             res.status(200).send('You cannot delete this question');
           } else {
             client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
-            res.send(200).send('Successfully DELETED data from heroku postgres!');
+            res.status(200).json({
+              msg: 'Question deleted',
+              deletestate: true,
+            });
           }
         });
         done();
@@ -185,7 +208,6 @@ router.delete('/:id', verifyToken, (req, res) => {
 
 router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
   jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
-    console.log(userData.authUser.userid);
     if (error) {
       res.sendStatus(403);
     } else {
@@ -203,7 +225,10 @@ router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
           }
           client.query('UPDATE answers SET state=$1 WHERE answerid=$2', [1, answerId]);
           done();
-          res.status(200).send('Answer accepted');
+          res.status(200).json({
+            msg: 'Answer accepted',
+            acceptstate: true,
+          });
         });
       });
     }
@@ -300,6 +325,5 @@ router.post('/addcomment/:qId/:answerId', (req, res) => {
   });
   res.json(answers);
 });
-
 
 export default router;

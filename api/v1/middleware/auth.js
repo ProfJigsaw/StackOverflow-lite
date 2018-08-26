@@ -45,7 +45,11 @@ router.post('/login', (req, res) => {
             if (jwerror) {
               return res.send('An error occured');
             }
-            res.send(`User logged in successfully. Token is: ${jwtoken}`);
+            return res.status(200).json({
+              msg: 'signup success',
+              loginstate: true,
+              token: jwtoken,
+            });
           });
         } else {
           res.status(200).send('User was not found!');
@@ -98,7 +102,11 @@ router.post('/signup', (req, res) => {
           if (jwterror) {
             return res.status(200).send('There was an error', err);
           }
-          return res.status(200).send(`User created successfully. Your token is ${jwtoken}`);
+          return res.status(200).json({
+            msg: 'signup success',
+            loginstate: true,
+            token: jwtoken,
+          });
         });
       });
       done();
@@ -122,7 +130,7 @@ router.get('/users', verifyToken, (req, res) => {
           if (errorbug) {
             res.send(errorbug);
           }
-          res.status(200).send(result.rows);
+          res.status(200).json(result.rows);
           client.end();
         });
         done();
