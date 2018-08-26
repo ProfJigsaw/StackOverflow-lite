@@ -7,11 +7,11 @@ dotenv.config();
 
 const router = express();
 const pool = new pg.Pool({
-  host: process.env.POSTGRES_AWS_HOST,
-  user: process.env.POSTGRES_USER,
-  database: process.env.POSTGRES_DATABASE,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT,
+  host: 'ec2-54-163-246-5.compute-1.amazonaws.com',
+  user: 'kykzfypdroonqq',
+  database: 'dbce24mref102i',
+  password: 'bad3fc10cb046ef90a7bfa47eb4626a5900d498d69801a83ea6395ed15cff8ae',
+  port: 5432,
   ssl: true,
 });
 
@@ -41,7 +41,7 @@ router.post('/login', (req, res) => {
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
-          }, process.env.JWT_SECRET_KEY, (jwerror, jwtoken) => {
+          }, 'elbicnivnisiwasgij', (jwerror, jwtoken) => {
             if (jwerror) {
               return res.send('An error occured');
             }
@@ -94,7 +94,7 @@ router.post('/signup', (req, res) => {
         const authUser = result.rows[0];
         jwt.sign({
           authUser,
-        }, process.env.JWT_SECRET_KEY, (jwterror, jwtoken) => {
+        }, 'elbicnivnisiwasgij', (jwterror, jwtoken) => {
           if (jwterror) {
             return res.status(200).send('There was an error', err);
           }
@@ -110,7 +110,7 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/users', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
     if (error) {
       res.sendStatus(403);
     } else {

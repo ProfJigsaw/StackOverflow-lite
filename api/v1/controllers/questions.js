@@ -10,11 +10,11 @@ require('dotenv').config();
 const router = express.Router();
 const { questions, answers } = dbpackage;
 const pool = new pg.Pool({
-  host: process.env.POSTGRES_AWS_HOST,
-  user: process.env.POSTGRES_USER,
-  database: process.env.POSTGRES_DATABASE,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT,
+  host: 'ec2-54-163-246-5.compute-1.amazonaws.com',
+  user: 'kykzfypdroonqq',
+  database: 'dbce24mref102i',
+  password: 'bad3fc10cb046ef90a7bfa47eb4626a5900d498d69801a83ea6395ed15cff8ae',
+  port: 5432,
   ssl: true,
 });
 
@@ -29,7 +29,7 @@ function verifyToken(req, res, next) {
 }
 
 router.get('/', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -47,7 +47,7 @@ router.get('/', verifyToken, (req, res) => {
 });
 
 router.get('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -107,7 +107,7 @@ router.post('/', verifyToken, (req, res) => {
   if (!req.body.question) {
     res.send('No question was entered');
   } else {
-    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+    jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
       if (error) {
         res.sendStatus(403);
       } else {
@@ -132,7 +132,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
   if (!req.body.answer) {
     res.send('No answer was sent');
   } else {
-    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+    jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
       if (error) {
         res.sendStatus(403);
       } else {
@@ -158,7 +158,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
 });
 
 router.delete('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
     if (error) {
       res.sendStatus(403);
     } else {
@@ -184,7 +184,7 @@ router.delete('/:id', verifyToken, (req, res) => {
 });
 
 router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
     console.log(userData.authUser.userid);
     if (error) {
       res.sendStatus(403);
