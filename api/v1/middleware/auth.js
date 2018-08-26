@@ -27,23 +27,32 @@ function verifyToken(req, res, next) {
 
 router.post('/login', (req, res) => {
   if (!req.body.username || !req.body.password) {
-    return res.send('Your entry contains a missing field.');
+    return res.json({
+      msg: 'Your entry contains a missing field.',
+      loginstate: false,
+    });
   }
   pool.connect((err, client, done) => {
     if (err) {
-      return res.status(200).send('error fetching client from pool', err);
+      return res.status(200).json({
+        msg: err,
+        loginstate: false,
+      });
     }
     client.query('SELECT userid, username FROM users WHERE username=$1 AND password=$2', [
         req.body.username,
         req.body.password,
       ], (errors, result) => {
-        if (result.rows.length === 1) {
+        if (result.rows.length) {
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
           }, 'elbicnivnisiwasgij', (jwerror, jwtoken) => {
             if (jwerror) {
-              return res.send('An error occured');
+              return res.status(200).json({
+                msg: 'An error occured',
+                loginstate: false,
+              });
             }
             return res.status(200).json({
               msg: 'signup success',
@@ -52,7 +61,10 @@ router.post('/login', (req, res) => {
             });
           });
         } else {
-          res.status(200).send('User was not found!');
+          res.status(200).json({
+            msg: 'User was not found!',
+            loginstate: false,
+          });
         }
         client.end();
       });
@@ -67,24 +79,38 @@ const testEmail = (email) => {
 
 router.post('/signup', (req, res) => {
   if (!req.body.username || !req.body.email || !req.body.password) {
-    return res.status(200).send('Your entry contains a missing field.');
+    return res.status(200).json({
+      msg: 'Your entry contains a missing field.',
+      loginstate: false,
+    });
   }
   if (!req.body.username.trim() || !req.body.email.trim() || !req.body.password.trim()) {
-    return res.status(200).send('One of your entries is empty.');
+    return res.status(200).json({
+      msg: 'One of your entries is empty.',
+      loginstate: false,
+    });
   }
   if (!testEmail(req.body.email)) {
-    return res.status(200).send('The email that you entered is invalid');
+    return res.status(200).json({
+      msg: 'The email that you entered is invalid',
+      loginstate: false,
+    });
   }
     pool.connect((err, client, done) => {
       if (err) {
-        return res.status(200).send('error fetching client from pool', err);
+        return res.status(200).json({
+          msg: err,
+          loginstate: false,
+        });
       }
       client.query('SELECT * FROM users WHERE username=$1', [req.body.username], (error, result) => {
         if (result.rows.length) {
-          return res.status(200).send('This username already exists, Please select another username');
+          return res.status(200).json({
+            msg: 'This username already exists, Please select another username',
+            loginstate: false,
+          });
         }
       });
-      // end of select
       done();
     });
 
@@ -100,7 +126,10 @@ router.post('/signup', (req, res) => {
           authUser,
         }, 'elbicnivnisiwasgij', (jwterror, jwtoken) => {
           if (jwterror) {
-            return res.status(200).send('There was an error', err);
+            return res.status(200).json({
+              msg: err,
+              loginstate: false,
+            });
           }
           return res.status(200).json({
             msg: 'signup success',

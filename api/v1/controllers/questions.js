@@ -35,7 +35,10 @@ router.get('/', verifyToken, (req, res) => {
     } else {
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).send('error fetching client from pool', err);
+          return res.status(200).json({
+            msg: err,
+            getstate: false,
+          });
         }
         client.query('SELECT * FROM questions', (bugFound, result) => {
           res.status(200).json({
@@ -61,11 +64,17 @@ router.get('/:id', verifyToken, (req, res) => {
       if (id) {
         pool.connect((err, client, done) => {
           if (err) {
-            return res.status(200).send('error fetching client from pool', err);
+            return res.status(200).json({
+              msg: err,
+              getstate: false,
+            });
           }
           client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
             if (result.rows.length === 0) {
-              res.status(200).send('This question id does not exist in the database');
+              res.status(200).json({
+                msg: 'This question id does not exist in the database',
+                getstate: false,
+              });
             } else {
               client.query('SELECT * FROM answers WHERE questionid=$1', [id], (errForAns, answers) => {
                 if (answers.rows.length === 0) {
@@ -88,7 +97,10 @@ router.get('/:id', verifyToken, (req, res) => {
           done();
         });
       } else {
-        res.send('Id must be a number');
+        res.json({
+          msg: 'Id must be a number',
+          getstate: false,
+        });
       }
     }
   });
@@ -118,7 +130,9 @@ router.post('/findQuestionById', (req, res) => {
 
 router.post('/', verifyToken, (req, res) => {
   if (!req.body.question) {
-    res.send('No question was entered');
+    res.json({
+      msg: 'No question was entered',
+    });
   } else {
     jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
       if (error) {
@@ -126,7 +140,10 @@ router.post('/', verifyToken, (req, res) => {
       } else {
         pool.connect((err, client, done) => {
           if (err) {
-            return res.status(200).send('Error fetching client from pool', err);
+            return res.status(200).json({
+              msg: err,
+              poststate: false,
+            });
           }
           client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
             Number(userData.authUser.userid),
@@ -146,7 +163,10 @@ router.post('/', verifyToken, (req, res) => {
 
 router.post('/:id/answers', verifyToken, (req, res) => {
   if (!req.body.answer) {
-    res.send('No answer was sent');
+    res.json({
+      msg: 'No answer was sent',
+      poststate: false,
+    });
   } else {
     jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
       if (error) {
@@ -154,7 +174,10 @@ router.post('/:id/answers', verifyToken, (req, res) => {
       } else {
         pool.connect((err, client, done) => {
           if (err) {
-            return res.status(200).send('error fetching client from pool', err);
+            return res.status(200).json({
+              msg: err,
+              poststate: false,
+            });
           }
           client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
             req.params.id,
@@ -184,14 +207,23 @@ router.delete('/:id', verifyToken, (req, res) => {
       const questId = Number(req.params.id);
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).send('Error fetching client from pool', err);
+          return res.status(200).json({
+            msg: err,
+            deletestate: false,
+          });
         }
         client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
-            return res.status(200).send(error);
+            return res.status(200).json({
+              msg: error,
+              deletestate: false,
+            });
           }
           if (result.rows.length === 0) {
-            res.status(200).send('You cannot delete this question');
+            res.status(200).json({
+              msg: 'You cannot delete this question',
+              deletestate: false,
+            });
           } else {
             client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
             res.status(200).json({
@@ -215,13 +247,19 @@ router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
       const answerId = Number(req.params.aId);
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).send('error fetching client from pool', err);
+          return res.status(200).json({
+            msg: err,
+            acceptstate: false,
+          });
         }
         client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
             return res.status(200).send(error);
           } if (result.rows.length === 0) {
-            return res.status(200).send('You cannot accept this question, you are not the author');
+            return res.status(200).json({
+              msg: 'You cannot accept this question, you are not the author',
+              acceptstate: false,
+            });
           }
           client.query('UPDATE answers SET state=$1 WHERE answerid=$2', [1, answerId]);
           done();
