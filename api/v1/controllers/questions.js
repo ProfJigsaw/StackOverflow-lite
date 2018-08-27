@@ -70,7 +70,7 @@ router.get('/:id', verifyToken, (req, res) => {
             });
           }
           client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
-            if (result.rows.length === 0) {
+            if (!result || result.rows.length === 0) {
               res.status(200).json({
                 msg: 'This question id does not exist in the database',
                 getstate: false,

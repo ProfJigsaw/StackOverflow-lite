@@ -43,7 +43,8 @@ router.post('/login', (req, res) => {
         req.body.username,
         req.body.password,
       ], (errors, result) => {
-        if (result) {
+        if (result && result.rows.length === 1) {
+          console.log(result);
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
@@ -66,7 +67,6 @@ router.post('/login', (req, res) => {
             loginstate: false,
           });
         }
-        client.end();
       });
     done();
   });
@@ -143,7 +143,10 @@ router.post('/signup', (req, res) => {
 });
 
 router.get('/signout', (req, res) => {
-  res.status(200).send('You have been successfully signed out of the platform.');
+  res.status(200).json({
+    msg: 'You have been successfully signed out of the platform.',
+    loginstate: false,
+  });
 });
 
 router.get('/users', verifyToken, (req, res) => {
@@ -160,7 +163,6 @@ router.get('/users', verifyToken, (req, res) => {
             res.send(errorbug);
           }
           res.status(200).json(result.rows);
-          client.end();
         });
         done();
       });
