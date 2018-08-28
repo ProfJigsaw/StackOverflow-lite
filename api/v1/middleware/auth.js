@@ -150,21 +150,14 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/users', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'elbicnivnisiwasgij', (error) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
     if (error) {
       res.sendStatus(403);
     } else {
-      pool.connect((err, client, done) => {
-        if (err) {
-          return res.status(200).send('Error fetching client from pool', err);
-        }
-        client.query('SELECT * FROM users', (errorbug, result) => {
-          if (errorbug) {
-            res.send(errorbug);
-          }
-          res.status(200).json(result.rows);
-        });
-        done();
+      res.status(200).json({
+        msg: 'Retrieve Success',
+        username: userData.authUser.username,
+        userid: userData.authUser.userid,
       });
     }
   });
