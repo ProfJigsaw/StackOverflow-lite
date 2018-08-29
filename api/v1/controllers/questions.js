@@ -331,26 +331,46 @@ router.get('/user/asked', verifyToken, (req, res) => {
   });
 });
 
-router.get('/questionsAnswered/:userId', (req, res) => {
-  const uId = Number(req.params.userId);
-  const qansd = [];
-  answers.map((ans) => {
-    if (ans.userId === uId) {
-      qansd.push(ans.questionId);
+router.get('/user/answered', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.status(200).json({
+            msg: err,
+            getstate: false,
+          });
+        }
+        client.query('SELECT * FROM answers WHERE userid=$1', [userData.authUser.userid], (errForAns, answerStack) => {
+          if (!answerStack || answerStack.rows.length === 0) {
+            res.status(200).json({
+              msg: 'You havent answered any questions on this platform, try ',
+              getstate: false,
+            });
+          } else {
+            client.query('SELECT * FROM questions', (err, result) => {
+              if (err) {
+                return res.status(200).json({
+                  msg: err,
+                  getstate: false,
+                });
+              }
+              res.status(200).json({
+                msg: 'All Info retrieved successfully',
+                getstate: true,
+                astack: answerStack.rows,
+                qstack: result.rows,
+              });
+            });
+          }
+        });
+        done();
+      });
     }
-    return false;
   });
-  const foundquestions = [];
-  qansd.map((id) => {
-    questions.map((question) => {
-      if (question.questionId === id) {
-        foundquestions.push(question);
-      }
-      return false;
-    });
-    return false;
-  });
-  res.json(foundquestions);
+
 });
 
 router.get('/topquestion/:uId', (req, res) => {
