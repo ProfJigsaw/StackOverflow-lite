@@ -44,7 +44,6 @@ router.post('/login', (req, res) => {
         req.body.password,
       ], (errors, result) => {
         if (result && result.rows.length === 1) {
-          console.log(result);
           const authUser = result.rows[0];
           jwt.sign({
             authUser,
