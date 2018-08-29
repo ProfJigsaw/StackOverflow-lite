@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import pg from 'pg';
+import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+
+const saltRounds = 1;
 
 dotenv.config();
 
@@ -39,33 +42,41 @@ router.post('/login', (req, res) => {
         loginstate: false,
       });
     }
-    client.query('SELECT userid, username FROM users WHERE username=$1 AND password=$2', [
+    client.query('SELECT userid, username, password FROM users WHERE username=$1', [
         req.body.username,
-        req.body.password,
       ], (errors, result) => {
         if (result && result.rows.length === 1) {
-          const authUser = result.rows[0];
-          jwt.sign({
-            authUser,
-          }, 'elbicnivnisiwasgij', (jwerror, jwtoken) => {
-            if (jwerror) {
-              return res.status(200).json({
-                msg: 'An error occured',
-                loginstate: false,
-              });
-            }
-            return res.status(200).json({
-              msg: 'signup success',
-              loginstate: true,
-              token: jwtoken,
+            bcrypt.compare(req.body.password, result.rows[0].password, (err, bcryptres) => {
+              if (bcryptres) {
+                const authUser = result.rows[0];
+                jwt.sign({
+                  authUser,
+                }, 'elbicnivnisiwasgij', (jwerror, jwtoken) => {
+                  if (jwerror) {
+                    return res.status(200).json({
+                      msg: 'An error occured',
+                      loginstate: false,
+                    });
+                  }
+                  return res.status(200).json({
+                    msg: 'Login success',
+                    loginstate: true,
+                    token: jwtoken,
+                  });
+                });
+              } else {
+                return res.status(200).json({
+                  msg: 'The Password supplied does not match the username',
+                  loginstate: false,
+                });
+              }
             });
-          });
-        } else {
-          res.status(200).json({
-            msg: 'User was not found!',
-            loginstate: false,
-          });
-        }
+          } else {
+            res.status(200).json({
+              msg: 'User was not found!',
+              loginstate: false,
+            });
+          }
       });
     done();
   });
@@ -74,6 +85,11 @@ router.post('/login', (req, res) => {
 const testEmail = (email) => {
   const emailregex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   return emailregex.test(email);
+};
+
+const testUsername = (username) => {
+  const usernameregex = /^[a-zA-Z]+[a-zA-Z0-9_]+$/;
+  return usernameregex.test(username);
 };
 
 router.post('/signup', (req, res) => {
@@ -95,6 +111,12 @@ router.post('/signup', (req, res) => {
       loginstate: false,
     });
   }
+  if (!testUsername(req.body.username)) {
+    return res.status(200).json({
+      msg: 'Usernames must start with alphabets and should not contain wilcards',
+      loginstate: false,
+    });
+  }
     pool.connect((err, client, done) => {
       if (err) {
         return res.status(200).json({
@@ -103,39 +125,50 @@ router.post('/signup', (req, res) => {
         });
       }
       client.query('SELECT * FROM users WHERE username=$1', [req.body.username], (error, result) => {
-        if (result.rows.length) {
-          return res.status(200).json({
+        if (result && result.rows.length > 0) {
+          res.status(200).json({
             msg: 'This username already exists, Please select another username',
             loginstate: false,
           });
-        }
-      });
-      done();
-    });
-
-    pool.connect((error, client, done) => {
-      client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
-        req.body.username,
-        req.body.email,
-        req.body.password,
-      ]);
-      client.query('SELECT userid, username FROM users WHERE username=$1', [req.body.username], (err, result) => {
-        const authUser = result.rows[0];
-        jwt.sign({
-          authUser,
-        }, 'elbicnivnisiwasgij', (jwterror, jwtoken) => {
-          if (jwterror) {
-            return res.status(200).json({
-              msg: err,
-              loginstate: false,
+        } else {
+          bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+            if (err) {
+              return res.status(200).json({
+                msg: 'There was a hashing error',
+                loginstate: false,
+              });
+            }
+            pool.connect((error, client, done) => {
+              client.query('INSERT INTO users(username, email, password) VALUES($1, $2, $3)', [
+                req.body.username,
+                req.body.email,
+                hash,
+              ]);
+              done();
             });
-          }
-          return res.status(200).json({
-            msg: 'signup success',
-            loginstate: true,
-            token: jwtoken,
           });
-        });
+          pool.connect((error, client, done) => {
+            client.query('SELECT userid, username FROM users WHERE username=$1', [req.body.username], (err, result) => {
+              const authUser = result.rows[0];
+              jwt.sign({
+                authUser,
+              }, 'elbicnivnisiwasgij', (jwterror, jwtoken) => {
+                if (jwterror) {
+                  return res.status(200).json({
+                    msg: err,
+                    loginstate: false,
+                  });
+                }
+                return res.status(200).json({
+                  msg: 'signup success',
+                  loginstate: true,
+                  token: jwtoken,
+                });
+              });
+            });
+            done();
+          });
+        }
       });
       done();
     });
