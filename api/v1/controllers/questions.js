@@ -299,10 +299,36 @@ router.get('/:downvote/:qId/:aId', (req, res) => {
   res.json(answers);
 });
 
-router.get('/user/:userId', (req, res) => {
-  const uId = Number(req.params.userId);
-  const userQuestions = questions.filter(qtn => qtn.userId === uId);
-  res.json(userQuestions);
+router.get('/user/asked', verifyToken, (req, res) => {
+  jwt.verify(req.token, 'elbicnivnisiwasgij', (error, userData) => {
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.status(200).json({
+            msg: err,
+            getstate: false,
+          });
+        }
+        client.query('SELECT * FROM questions WHERE userid=$1', [userData.authUser.userid], (errForAns, result) => {
+          if (!result || result.rows.length === 0) {
+            res.status(200).json({
+              msg: 'You dont have any question on the this platform, try adding one',
+              getstate: false,
+            });
+          } else {
+            res.status(200).json({
+              msg: 'Your questions retrieved successfully',
+              getstate: true,
+              qstack: result.rows,
+            });
+          }
+        });
+        done();
+      });
+    }
+  });
 });
 
 router.get('/questionsAnswered/:userId', (req, res) => {
