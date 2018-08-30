@@ -89,7 +89,7 @@ router.get('/:id', verifyToken, (req, res) => {
                 if (answers.rows.length === 0) {
                   res.status(200).json({
                     message: 'Specified question retrieved',
-                    sucess: true,
+                    success: true,
                     data: result.rows,
                   });
                 } else {
@@ -350,8 +350,8 @@ router.get('/user/asked', verifyToken, (req, res) => {
             });
           } else {
             res.status(200).json({
-              msg: 'Your questions retrieved successfully',
-              getstate: true,
+              message: 'Your questions retrieved successfully',
+              success: true,
               questions: result.rows,
             });
           }
@@ -374,7 +374,7 @@ router.get('/user/answered', verifyToken, (req, res) => {
         if (err) {
           return res.status(500).json({
             success: false,
-            msg: err,
+            message: err,
           });
         }
         client.query('SELECT * FROM answers WHERE userid=$1', [userData.authUser.userid], (errForAns, answerStack) => {
@@ -388,12 +388,12 @@ router.get('/user/answered', verifyToken, (req, res) => {
               if (err) {
                 return res.status(500).json({
                   success: false,
-                  msg: err,
+                  message: err,
                 });
               }
               res.status(200).json({
-                msg: 'All Info retrieved successfully',
-                getstate: true,
+                message: 'All Info retrieved successfully',
+                success: true,
                 data: {
                   answers: answerStack.rows,
                   questions: result.rows,
