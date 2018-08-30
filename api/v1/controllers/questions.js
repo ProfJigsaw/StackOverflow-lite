@@ -344,7 +344,7 @@ router.get('/user/asked', verifyToken, (req, res) => {
         }
         client.query('SELECT * FROM questions WHERE userid=$1', [userData.authUser.userid], (errForAns, result) => {
           if (!result || result.rows.length === 0) {
-            res.status(204).json({
+            res.status(200).json({
               success: false,
               message: 'You dont have any question on the this platform, try adding one',
             });
