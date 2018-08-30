@@ -36,5 +36,7 @@ app.use(expressApiVersioning({
   next();
 }));
 
-app.listen(port);
+app.listen(port, () => {
+  console.log('Server started on port 8080');
+});
 export default app;
