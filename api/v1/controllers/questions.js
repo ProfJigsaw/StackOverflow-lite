@@ -95,7 +95,7 @@ router.get('/:id', verifyToken, (req, res) => {
                 } else {
                   res.status(200).json({
                     msg: 'Specified question retrieved',
-                    getstate: true,
+                    success: true,
                     data: {
                       question: result.rows,
                       answers: answers.rows,
