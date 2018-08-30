@@ -379,7 +379,7 @@ router.get('/user/answered', verifyToken, (req, res) => {
         }
         client.query('SELECT * FROM answers WHERE userid=$1', [userData.authUser.userid], (errForAns, answerStack) => {
           if (!answerStack || answerStack.rows.length === 0) {
-            res.status(204).json({
+            res.status(200).json({
               success: false,
               message: 'You havent answered any questions on this platform, try ',
             });
