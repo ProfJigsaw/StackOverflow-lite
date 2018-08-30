@@ -18,33 +18,39 @@ const pool = new pg.Pool({
   ssl: true,
 });
 
-function verifyToken(req, res, next) {
+const verifyToken = (req, res, next) => {
   const bearHeader = req.headers.authorization;
   if (bearHeader) {
     [, req.token] = bearHeader.split(' ');
     next();
   } else {
-    res.sendStatus(403);
+    res.status(401).json({
+      success: false,
+      message: 'Recipe does not exist',
+    });
   }
-}
+};
 
 router.get('/', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
     if (error) {
-      res.sendStatus(403);
+      res.status(417).json({
+        success: true,
+        message: 'An error occured while verifying token',
+      });
     } else {
       pool.connect((err, client, done) => {
         if (err) {
           return res.status(200).json({
-            msg: err,
-            getstate: false,
+            success: false,
+            message: err,
           });
         }
         client.query('SELECT * FROM questions', (bugFound, result) => {
           res.status(200).json({
-            msg: 'All questions retrieved',
-            getstate: true,
-            qstack: result.rows,
+            success: true,
+            message: 'All questions retrieved',
+            questions: result.rows,
           });
         });
         done();
@@ -56,7 +62,10 @@ router.get('/', verifyToken, (req, res) => {
 router.get('/:id', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
     if (error) {
-      res.sendStatus(403);
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token',
+      });
     } else {
       let { id } = req.params;
       id = id.replace(/[^0-9]+/, '');
@@ -64,31 +73,33 @@ router.get('/:id', verifyToken, (req, res) => {
       if (id) {
         pool.connect((err, client, done) => {
           if (err) {
-            return res.status(200).json({
-              msg: err,
-              getstate: false,
+            return res.status(500).json({
+              success: false,
+              message: err,
             });
           }
           client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
             if (!result || result.rows.length === 0) {
               res.status(200).json({
-                msg: 'This question id does not exist in the database',
-                getstate: false,
+                message: 'This question id does not exist in the database',
+                success: false,
               });
             } else {
               client.query('SELECT * FROM answers WHERE questionid=$1', [id], (errForAns, answers) => {
                 if (answers.rows.length === 0) {
                   res.status(200).json({
-                    msg: 'Specified question retrieved',
-                    getstate: true,
-                    qstack: result.rows,
+                    message: 'Specified question retrieved',
+                    sucess: true,
+                    data: result.rows,
                   });
                 } else {
                   res.status(200).json({
                     msg: 'Specified question retrieved',
                     getstate: true,
-                    qstack: result.rows,
-                    astack: answers.rows,
+                    data: {
+                      question: result.rows,
+                      answers: answers.rows,
+                    },
                   });
                 }
               });
@@ -97,9 +108,9 @@ router.get('/:id', verifyToken, (req, res) => {
           done();
         });
       } else {
-        res.json({
-          msg: 'Id must be a number',
-          getstate: false,
+        res.status(400).json({
+          success: false,
+          message: 'Id must be a number',
         });
       }
     }
@@ -131,18 +142,22 @@ router.post('/findQuestionById', (req, res) => {
 router.post('/', verifyToken, (req, res) => {
   if (!req.body.question) {
     res.json({
-      msg: 'No question was entered',
+      success: false,
+      message: 'No question was entered',
     });
   } else {
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
       if (error) {
-        res.sendStatus(403);
+        res.status(401).json({
+          success: true,
+          message: 'An error occured while verifying token',
+        });
       } else {
         pool.connect((err, client, done) => {
           if (err) {
-            return res.status(200).json({
-              msg: err,
-              poststate: false,
+            return res.status(500).json({
+              success: false,
+              message: err,
             });
           }
           client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
@@ -151,9 +166,9 @@ router.post('/', verifyToken, (req, res) => {
             req.body.question,
           ]);
           done();
-          res.status(200).json({
-            msg: 'Question posted',
-            poststate: true,
+          res.status(201).json({
+            success: true,
+            message: 'Question posted',
           });
         });
       }
@@ -163,20 +178,23 @@ router.post('/', verifyToken, (req, res) => {
 
 router.post('/:id/answers', verifyToken, (req, res) => {
   if (!req.body.answer) {
-    res.json({
-      msg: 'No answer was sent',
-      poststate: false,
+    res.status(200).json({
+      success: false,
+      message: 'No answer was sent',
     });
   } else {
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
       if (error) {
-        res.sendStatus(403);
+        res.status(401).json({
+          success: true,
+          message: 'An error occured while verifying token',
+        });
       } else {
         pool.connect((err, client, done) => {
           if (err) {
-            return res.status(200).json({
-              msg: err,
-              poststate: false,
+            return res.status(500).json({
+              success: false,
+              message: err,
             });
           }
           client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
@@ -189,9 +207,9 @@ router.post('/:id/answers', verifyToken, (req, res) => {
             0,
           ]);
           done();
-          res.status(200).json({
-            msg: 'Answer posted',
-            poststate: true,
+          res.status(201).json({
+            success: true,
+            message: 'Answer posted',
           });
         });
       }
@@ -202,33 +220,36 @@ router.post('/:id/answers', verifyToken, (req, res) => {
 router.delete('/:id', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
-      res.sendStatus(403);
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token',
+      });
     } else {
       const questId = Number(req.params.id);
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).json({
-            msg: err,
-            deletestate: false,
+          return res.status(500).json({
+            success: false,
+            message: err,
           });
         }
         client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
-            return res.status(200).json({
-              msg: error,
-              deletestate: false,
+            return res.status(500).json({
+              success: false,
+              message: error,
             });
           }
           if (result.rows.length === 0) {
-            res.status(200).json({
-              msg: 'You cannot delete this question',
-              deletestate: false,
+            res.status(401).json({
+              success: false,
+              message: 'You cannot delete this question',
             });
           } else {
             client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
             res.status(200).json({
-              msg: 'Question deleted',
-              deletestate: true,
+              success: true,
+              message: 'Question deleted',
             });
           }
         });
@@ -241,31 +262,38 @@ router.delete('/:id', verifyToken, (req, res) => {
 router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
-      res.sendStatus(403);
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token',
+      });
     } else {
       const questId = Number(req.params.qId);
       const answerId = Number(req.params.aId);
       pool.connect((err, client, done) => {
         if (err) {
           return res.status(200).json({
-            msg: err,
-            acceptstate: false,
+            message: err,
+            success: false,
           });
         }
         client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], (error, result) => {
           if (error) {
-            return res.status(200).send(error);
-          } if (result.rows.length === 0) {
             return res.status(200).json({
-              msg: 'You cannot accept this question, you are not the author',
-              acceptstate: false,
+              success: false,
+              message: error,
+            });
+          }
+          if (result.rows.length === 0) {
+            return res.status(200).json({
+              success: false,
+              message: 'You cannot accept this question, you are not the author',
             });
           }
           client.query('UPDATE answers SET state=$1 WHERE answerid=$2', [1, answerId]);
           done();
-          res.status(200).json({
-            msg: 'Answer accepted',
-            acceptstate: true,
+          res.status(202).json({
+            success: true,
+            message: 'Answer accepted',
           });
         });
       });
@@ -302,26 +330,29 @@ router.get('/:downvote/:qId/:aId', (req, res) => {
 router.get('/user/asked', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
-      res.sendStatus(403);
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token',
+      });
     } else {
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).json({
-            msg: err,
-            getstate: false,
+          return res.status(500).json({
+            success: false,
+            message: err,
           });
         }
         client.query('SELECT * FROM questions WHERE userid=$1', [userData.authUser.userid], (errForAns, result) => {
           if (!result || result.rows.length === 0) {
-            res.status(200).json({
-              msg: 'You dont have any question on the this platform, try adding one',
-              getstate: false,
+            res.status(204).json({
+              success: false,
+              message: 'You dont have any question on the this platform, try adding one',
             });
           } else {
             res.status(200).json({
               msg: 'Your questions retrieved successfully',
               getstate: true,
-              qstack: result.rows,
+              questions: result.rows,
             });
           }
         });
@@ -334,34 +365,39 @@ router.get('/user/asked', verifyToken, (req, res) => {
 router.get('/user/answered', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
-      res.sendStatus(403);
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token',
+      });
     } else {
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).json({
+          return res.status(500).json({
+            success: false,
             msg: err,
-            getstate: false,
           });
         }
         client.query('SELECT * FROM answers WHERE userid=$1', [userData.authUser.userid], (errForAns, answerStack) => {
           if (!answerStack || answerStack.rows.length === 0) {
-            res.status(200).json({
-              msg: 'You havent answered any questions on this platform, try ',
-              getstate: false,
+            res.status(204).json({
+              success: false,
+              message: 'You havent answered any questions on this platform, try ',
             });
           } else {
             client.query('SELECT * FROM questions', (err, result) => {
               if (err) {
-                return res.status(200).json({
+                return res.status(500).json({
+                  success: false,
                   msg: err,
-                  getstate: false,
                 });
               }
               res.status(200).json({
                 msg: 'All Info retrieved successfully',
                 getstate: true,
-                astack: answerStack.rows,
-                qstack: result.rows,
+                data: {
+                  answers: answerStack.rows,
+                  questions: result.rows,
+                },
               });
             });
           }
