@@ -140,10 +140,10 @@ router.post('/findQuestionById', (req, res) => {
 });
 
 router.post('/', verifyToken, (req, res) => {
-  if (!req.body.question) {
-    res.json({
+  if (!req.body.question || !req.body.title) {
+    res.status(400).json({
       success: false,
-      message: 'No question was entered',
+      message: 'There is a missing field',
     });
   } else {
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
@@ -160,10 +160,11 @@ router.post('/', verifyToken, (req, res) => {
               message: err,
             });
           }
-          client.query('INSERT INTO questions(userid, username, question) VALUES($1, $2, $3)', [
+          client.query('INSERT INTO questions(userid, username, question, title) VALUES($1, $2, $3, $4)', [
             Number(userData.authUser.userid),
             userData.authUser.username,
             req.body.question,
+            req.body.title,
           ]);
           done();
           res.status(201).json({
@@ -178,7 +179,7 @@ router.post('/', verifyToken, (req, res) => {
 
 router.post('/:id/answers', verifyToken, (req, res) => {
   if (!req.body.answer) {
-    res.status(200).json({
+    res.status(400).json({
       success: false,
       message: 'No answer was sent',
     });
