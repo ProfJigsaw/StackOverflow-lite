@@ -4,9 +4,19 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _jsonwebtoken = require('jsonwebtoken');
+
+var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
+
 var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
+
+var _pg = require('pg');
+
+var _pg2 = _interopRequireDefault(_pg);
 
 var _dbstruct = require('../model/dbstruct');
 
@@ -22,45 +32,124 @@ var _mode2 = _interopRequireDefault(_mode);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+require('dotenv').config();
+
 var router = _express2.default.Router();
 var questions = _dbstruct2.default.questions,
     answers = _dbstruct2.default.answers;
 
-
-router.get('/', function (req, res) {
-  res.json(questions);
+var pool = new _pg2.default.Pool({
+  host: process.env.POSTGRES_AWS_HOST,
+  user: process.env.POSTGRES_USER,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: process.env.POSTGRES_PORT,
+  ssl: true
 });
 
-router.post('/error', function (req, res) {
-  res.send('There was an error!');
-});
+var verifyToken = function verifyToken(req, res, next) {
+  var bearHeader = req.headers.authorization;
+  if (bearHeader) {
+    var _bearHeader$split = bearHeader.split(' ');
 
-router.get('/:id', function (req, res) {
-  var id = Number(req.params.id);
-  var found = questions.filter(function (o) {
-    return o.questionId === id;
-  });
-  if (found.length === 1) {
-    res.json(found[0]);
+    var _bearHeader$split2 = _slicedToArray(_bearHeader$split, 2);
+
+    req.token = _bearHeader$split2[1];
+
+    next();
   } else {
-    res.send('This question id [ ' + id + ' ] doesnt exit yet, create it by posting at "/questions"');
-  }
-});
-
-router.get('/questionThread/:qId', function (req, res) {
-  var id = Number(req.params.qId);
-  var found = questions.filter(function (o) {
-    return o.questionId === id;
-  });
-  if (found.length === 1) {
-    var qId = found[0].questionId;
-    var answerForQuestion = answers.filter(function (o) {
-      return o.questionId === qId;
+    res.status(401).json({
+      success: false,
+      message: 'JWT Authentication Error'
     });
-    res.json(answerForQuestion);
-  } else {
-    res.send('This question id was not found');
   }
+};
+
+router.get('/', verifyToken, function (req, res) {
+  _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error) {
+    if (error) {
+      res.status(417).json({
+        success: true,
+        message: 'An error occured while verifying token'
+      });
+    } else {
+      pool.connect(function (err, client, done) {
+        if (err) {
+          return res.status(200).json({
+            success: false,
+            message: err
+          });
+        }
+        client.query('SELECT * FROM questions', function (bugFound, result) {
+          res.status(200).json({
+            success: true,
+            message: 'All questions retrieved',
+            questions: result.rows
+          });
+        });
+        done();
+      });
+    }
+  });
+});
+
+router.get('/:id', verifyToken, function (req, res) {
+  _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error) {
+    if (error) {
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token'
+      });
+    } else {
+      var id = req.params.id;
+
+      id = id.replace(/[^0-9]+/, '');
+      id = Number(id);
+      if (id) {
+        pool.connect(function (err, client, done) {
+          if (err) {
+            return res.status(500).json({
+              success: false,
+              message: err
+            });
+          }
+          client.query('SELECT * FROM questions WHERE questionid=$1', [id], function (error, result) {
+            if (!result || result.rows.length === 0) {
+              res.status(200).json({
+                message: 'This question id does not exist in the database',
+                success: false
+              });
+            } else {
+              client.query('SELECT * FROM answers WHERE questionid=$1', [id], function (errForAns, answers) {
+                if (answers.rows.length === 0) {
+                  res.status(200).json({
+                    message: 'Specified question retrieved',
+                    success: true,
+                    data: result.rows
+                  });
+                } else {
+                  res.status(200).json({
+                    msg: 'Specified question retrieved',
+                    success: true,
+                    data: {
+                      question: result.rows,
+                      answers: answers.rows
+                    }
+                  });
+                }
+              });
+            }
+          });
+          done();
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: 'Id must be a number'
+        });
+      }
+    }
+  });
 });
 
 router.post('/findQuestion', function (req, res) {
@@ -88,86 +177,154 @@ router.post('/findQuestionById', function (req, res) {
   }
 });
 
-router.post('/', function (req, res) {
-  questions.unshift({
-    questionId: Number((0, _genUniqueId2.default)(questions, 'questionId')),
-    userId: Number(req.body.userId),
-    username: req.body.username,
-    question: req.body.question
-  });
-  res.json(questions);
-});
-
-router.post('/:id/answers', function (req, res) {
-  var questId = req.params.id;
-  var entPut = req.body.answer;
-  answers.push({
-    answerId: (0, _genUniqueId2.default)(answers, 'answerId'),
-    questionId: Number(questId),
-    userId: Number(req.body.userId),
-    username: req.body.username,
-    answer: entPut,
-    answerState: '',
-    votes: 0,
-    comments: []
-  });
-  res.json(answers);
-});
-
-router.post('/:id/delete', function (req, res) {
-  var questId = Number(req.params.id);
-  var userId = req.body.userId;
-
-  var goAhead = false;
-  questions.map(function (question) {
-    if (question.questionId === questId && question.userId === Number(userId)) {
-      goAhead = true;
-    }
-    return true;
-  });
-  if (goAhead === true) {
-    questions = questions.filter(function (question) {
-      return question.questionId !== questId;
+router.post('/', verifyToken, function (req, res) {
+  if (!req.body.question || !req.body.title) {
+    res.status(400).json({
+      success: false,
+      message: 'There is a missing field'
     });
-    answers = answers.filter(function (answer) {
-      return answer.questionId !== questId;
-    });
-    res.redirect('/api/v1/questions');
   } else {
-    res.render('usererror', {
-      error: {
-        errorMsg: 'You are not the author of this question, therefore you cant delete it',
-        errorType: 'Delete Not Allowed'
-      }
-    });
-  }
-});
-
-router.post('/:qId/:aId/accept', function (req, res) {
-  var questId = Number(req.params.qId);
-  var answerId = Number(req.params.aId);
-  var uId = req.body.userId;
-  var goAhead = false;
-  questions.map(function (question) {
-    if (question.questionId === questId && question.userId === Number(uId)) {
-      goAhead = true;
-    }
-    return true;
-  });
-  /* eslint-disable no-param-reassign */
-  if (goAhead === true) {
-    answers.map(function (ans) {
-      if (ans.answerId === answerId) {
-        ans.acceptState = 'accepted';
+    _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error, userData) {
+      if (error) {
+        res.status(401).json({
+          success: true,
+          message: 'An error occured while verifying token'
+        });
       } else {
-        ans.acceptState = '';
+        pool.connect(function (err, client, done) {
+          if (err) {
+            return res.status(500).json({
+              success: false,
+              message: err
+            });
+          }
+          client.query('INSERT INTO questions(userid, username, question, title) VALUES($1, $2, $3, $4)', [Number(userData.authUser.userid), userData.authUser.username, req.body.question, req.body.title]);
+          done();
+          res.status(201).json({
+            success: true,
+            message: 'Question posted'
+          });
+        });
       }
-      return true;
     });
-    res.json(answers);
-  } else {
-    res.send('You cant accept this, you didnt create the question');
   }
+});
+
+router.post('/:id/answers', verifyToken, function (req, res) {
+  if (!req.body.answer) {
+    res.status(400).json({
+      success: false,
+      message: 'No answer was sent'
+    });
+  } else {
+    _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error, userData) {
+      if (error) {
+        res.status(401).json({
+          success: true,
+          message: 'An error occured while verifying token'
+        });
+      } else {
+        pool.connect(function (err, client, done) {
+          if (err) {
+            return res.status(500).json({
+              success: false,
+              message: err
+            });
+          }
+          client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [req.params.id, userData.authUser.userid, userData.authUser.username, req.body.answer, 0, 0, 0]);
+          done();
+          res.status(201).json({
+            success: true,
+            message: 'Answer posted'
+          });
+        });
+      }
+    });
+  }
+});
+
+router.delete('/:id', verifyToken, function (req, res) {
+  _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error, userData) {
+    if (error) {
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token'
+      });
+    } else {
+      var questId = Number(req.params.id);
+      pool.connect(function (err, client, done) {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: err
+          });
+        }
+        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], function (error, result) {
+          if (error) {
+            return res.status(500).json({
+              success: false,
+              message: error
+            });
+          }
+          if (result.rows.length === 0) {
+            res.status(401).json({
+              success: false,
+              message: 'You cannot delete this question'
+            });
+          } else {
+            client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
+            res.status(200).json({
+              success: true,
+              message: 'Question deleted'
+            });
+          }
+        });
+        done();
+      });
+    }
+  });
+});
+
+router.put('/:qId/answers/:aId/', verifyToken, function (req, res) {
+  _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error, userData) {
+    if (error) {
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token'
+      });
+    } else {
+      var questId = Number(req.params.qId);
+      var answerId = Number(req.params.aId);
+      pool.connect(function (err, client, done) {
+        if (err) {
+          return res.status(200).json({
+            message: err,
+            success: false
+          });
+        }
+        client.query('SELECT * FROM questions WHERE questionid=$1 AND userid=$2', [questId, userData.authUser.userid], function (error, result) {
+          if (error) {
+            return res.status(200).json({
+              success: false,
+              message: error
+            });
+          }
+          if (result.rows.length === 0) {
+            return res.status(200).json({
+              success: false,
+              message: 'You cannot accept this question, you are not the author'
+            });
+          }
+          client.query('UPDATE answers SET state=$1 WHERE answerid=$2', [1, answerId]);
+          done();
+          res.status(202).json({
+            success: true,
+            message: 'Answer accepted'
+          });
+        });
+      });
+    }
+  });
 });
 
 router.get('/:qId/:aId/vote', function (req, res) {
@@ -194,34 +351,85 @@ router.get('/:downvote/:qId/:aId', function (req, res) {
   res.json(answers);
 });
 
-router.get('/user/:userId', function (req, res) {
-  var uId = Number(req.params.userId);
-  var userQuestions = questions.filter(function (qtn) {
-    return qtn.userId === uId;
+router.get('/user/asked', verifyToken, function (req, res) {
+  _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error, userData) {
+    if (error) {
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token'
+      });
+    } else {
+      pool.connect(function (err, client, done) {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: err
+          });
+        }
+        client.query('SELECT * FROM questions WHERE userid=$1', [userData.authUser.userid], function (errForAns, result) {
+          if (!result || result.rows.length === 0) {
+            res.status(200).json({
+              success: false,
+              message: 'You dont have any question on the this platform, try adding one'
+            });
+          } else {
+            res.status(200).json({
+              message: 'Your questions retrieved successfully',
+              success: true,
+              questions: result.rows
+            });
+          }
+        });
+        done();
+      });
+    }
   });
-  res.json(userQuestions);
 });
 
-router.get('/questionsAnswered/:userId', function (req, res) {
-  var uId = Number(req.params.userId);
-  var qansd = [];
-  answers.map(function (ans) {
-    if (ans.userId === uId) {
-      qansd.push(ans.questionId);
+router.get('/user/answered', verifyToken, function (req, res) {
+  _jsonwebtoken2.default.verify(req.token, process.env.JWT_SECRET_KEY, function (error, userData) {
+    if (error) {
+      res.status(401).json({
+        success: true,
+        message: 'An error occured while verifying token'
+      });
+    } else {
+      pool.connect(function (err, client, done) {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: err
+          });
+        }
+        client.query('SELECT * FROM answers WHERE userid=$1', [userData.authUser.userid], function (errForAns, answerStack) {
+          if (!answerStack || answerStack.rows.length === 0) {
+            res.status(200).json({
+              success: false,
+              message: 'You havent answered any questions on this platform, try '
+            });
+          } else {
+            client.query('SELECT * FROM questions', function (err, result) {
+              if (err) {
+                return res.status(500).json({
+                  success: false,
+                  message: err
+                });
+              }
+              res.status(200).json({
+                message: 'All Info retrieved successfully',
+                success: true,
+                data: {
+                  answers: answerStack.rows,
+                  questions: result.rows
+                }
+              });
+            });
+          }
+        });
+        done();
+      });
     }
-    return false;
   });
-  var foundquestions = [];
-  qansd.map(function (id) {
-    questions.map(function (question) {
-      if (question.questionId === id) {
-        foundquestions.push(question);
-      }
-      return false;
-    });
-    return false;
-  });
-  res.json(foundquestions);
 });
 
 router.get('/topquestion/:uId', function (req, res) {

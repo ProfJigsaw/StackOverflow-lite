@@ -119,12 +119,6 @@ describe('API URL VERSION 1 TEST:', () => {
     .expect(404)
     .end(done);
   });
-  it('it should throw an internal server error 500', (done) => {
-    request(server)
-    .get('/api/v1/user')
-    .expect(500)
-    .end(done);
-  });
 });
 
 describe('API URL VERSION 1 Endpoints TESTS', () => {
@@ -158,19 +152,19 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
   it('it should return a forbidden status when accessing questions without auth', (done) => {
     request(server)
     .get('/api/v1/questions')
-    .expect(403)
+    .expect(401)
     .end(done);
   });
   it('it should return a forbidden status in trying to get specific question', (done) => {
     request(server)
     .get('/api/v1/questions/2')
-    .expect(403)
+    .expect(401)
     .end(done);
   });
   it('it should return a forbidden status', (done) => {
     request(server)
     .get('/api/v1/auth/users')
-    .expect(403)
+    .expect(401)
     .end(done);
   });
   it('it should return a forbidden status for unauthorized posts', (done) => {
@@ -181,7 +175,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       userId: 3,
       question: 'what is life?',
     })
-    .expect(403)
+    .expect(401)
     .end(done);
   });
   it('it should return a forbidden status for unauthorized answer post', (done) => {
@@ -192,7 +186,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       userId: 2,
       answer: 'life is mysterious',
     })
-    .expect(403)
+    .expect(401)
     .end(done);
   });
   it('Unauthorized users should not be able to delete question', (done) => {
@@ -201,7 +195,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       .send({
         userId: 2,
       })
-      .expect(403)
+      .expect(401)
       .end(done);
   });
   it('Unauthorized users should not be able to accept an answer', (done) => {
@@ -210,7 +204,7 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       .send({
         userId: 2,
       })
-      .expect(403)
+      .expect(401)
       .end(done);
   });
 });
