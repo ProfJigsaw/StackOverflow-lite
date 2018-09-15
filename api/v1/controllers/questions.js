@@ -85,8 +85,8 @@ router.get('/:id', verifyToken, (req, res) => {
                 success: false,
               });
             } else {
-              client.query('SELECT * FROM answers WHERE questionid=$1', [id], (errForAns, answers) => {
-                if (answers.rows.length === 0) {
+              client.query('SELECT * FROM answers WHERE questionid=$1 ORDER BY answerid ASC', [id], (errForAns, answers) => {
+                if (!answers || answers.rows.length === 0) {
                   res.status(200).json({
                     message: 'Specified question retrieved',
                     success: true,
@@ -287,7 +287,7 @@ router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
           if (result.rows.length === 0) {
             return res.status(200).json({
               success: false,
-              message: 'You cannot accept this question, you are not the author',
+              message: 'This answer can only be accepted by the questions author.',
             });
           }
           client.query('UPDATE answers SET state=$1 WHERE answerid=$2', [1, answerId]);
@@ -302,30 +302,50 @@ router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
   });
 });
 
-router.get('/:qId/:aId/vote', (req, res) => {
-  answers.map((answer) => {
-    if (answer.questionId === Number(req.params.qId)
-    && answer.answerId === Number(req.params.aId)) {
-      answer.votes += 1;
+router.put('/:qId/:aId/upvote', (req, res) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.status(200).json({
+        message: err,
+        success: false,
+      });
     }
-    return false;
+    client.query('UPDATE answers SET upvotes = upvotes + 1 WHERE questionid = $1 AND answerid = $2',
+    [req.params.qId, req.params.aId], (error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        res.status(201).json({
+          success: true,
+          message: 'Answer upvoted',
+        });
+      }
+    });
+  done();
   });
-  res.json(answers);
 });
 
-router.get('/:downvote/:qId/:aId', (req, res) => {
-  answers.map((answer) => {
-    if (answer.questionId === Number(req.params.qId)
-    && answer.answerId === Number(req.params.aId)) {
-      if (answer.votes > 0) {
-        answer.votes -= 1;
-      } else {
-        answer.votes = answer.votes;
-      }
+router.put('/:qId/:aId/downvote', (req, res) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.status(200).json({
+        message: err,
+        success: false,
+      });
     }
-    return false;
+    client.query('UPDATE answers SET downvotes = downvotes + 1 WHERE questionid = $1 AND answerid = $2',
+      [req.params.qId, req.params.aId], (error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          res.status(201).json({
+            success: true,
+            message: 'Answer downvoted',
+          });
+        }
+      });
+    done();
   });
-  res.json(answers);
 });
 
 router.get('/user/asked', verifyToken, (req, res) => {
