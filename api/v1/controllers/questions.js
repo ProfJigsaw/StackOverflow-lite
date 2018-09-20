@@ -35,7 +35,7 @@ router.get('/', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
     if (error) {
       res.status(417).json({
-        success: true,
+        success: false,
         message: 'An error occured while verifying token',
       });
     } else {
@@ -63,7 +63,7 @@ router.get('/:id', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
     if (error) {
       res.status(401).json({
-        success: true,
+        success: false,
         message: 'An error occured while verifying token',
       });
     } else {
@@ -149,7 +149,7 @@ router.post('/', verifyToken, (req, res) => {
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
       if (error) {
         res.status(401).json({
-          success: true,
+          success: false,
           message: 'An error occured while verifying token',
         });
       } else {
@@ -187,7 +187,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
       if (error) {
         res.status(401).json({
-          success: true,
+          success: false,
           message: 'An error occured while verifying token',
         });
       } else {
@@ -222,7 +222,7 @@ router.delete('/:id', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
       res.status(401).json({
-        success: true,
+        success: false,
         message: 'An error occured while verifying token',
       });
     } else {
@@ -264,7 +264,7 @@ router.put('/:qId/answers/:aId/', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
       res.status(401).json({
-        success: true,
+        success: false,
         message: 'An error occured while verifying token',
       });
     } else {
@@ -352,7 +352,7 @@ router.get('/user/asked', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
       res.status(401).json({
-        success: true,
+        success: false,
         message: 'An error occured while verifying token',
       });
     } else {
@@ -387,7 +387,7 @@ router.get('/user/answered', verifyToken, (req, res) => {
   jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
     if (error) {
       res.status(401).json({
-        success: true,
+        success: false,
         message: 'An error occured while verifying token',
       });
     } else {
@@ -402,7 +402,7 @@ router.get('/user/answered', verifyToken, (req, res) => {
           if (!answerStack || answerStack.rows.length === 0) {
             res.status(200).json({
               success: false,
-              message: 'You havent answered any questions on this platform, try ',
+              message: 'You havent answered any questions on this platform, try adding some answers',
             });
           } else {
             client.query('SELECT * FROM questions', (err, result) => {
@@ -430,41 +430,93 @@ router.get('/user/answered', verifyToken, (req, res) => {
 
 });
 
-router.get('/topquestion/:uId', (req, res) => {
-  const uId = Number(req.params.uId);
-  const userQuestions = questions.filter(qtn => Number(qtn.userId) === uId);
-  const questionsAnswered = [];
-  userQuestions.map((question) => {
-    answers.map((answer) => {
-      if (answer.questionId === question.questionId) {
-        questionsAnswered.push(question.questionId);
-      }
-      return false;
+router.get('/stack/topquestion', (req, res) => {
+  pool.connect()
+  .then(async (client) => {
+    const questions = await client.query('SELECT * FROM questions');
+    const answers = await client.query('SELECT * FROM answers');
+    return res.status(200).json({
+      success: true,
+      message: 'All data retrieved successfully',
+      questions: questions.rows,
+      answers: answers.rows,
     });
-    return false;
+  })
+  .catch((error) => {
+    res.status(200).json({
+      success: false,
+      message: 'An error occured',
+    });
   });
-  const modeqtn = mode(questionsAnswered);
-  const topqtn = userQuestions.filter(question => question.questionId === modeqtn);
-  res.json(topqtn);
 });
 
-router.post('/addcomment/:qId/:answerId', (req, res) => {
-  const questId = Number(req.params.qId);
-  const ansId = Number(req.params.answerId);
-  const { comment } = req.body;
-  answers.map((ans) => {
-   if (ans.questionId === questId && ans.answerId === ansId) {
-      ans.comments.push({
-        commentId: generateUniqueId(ans.comments, 'commentId'),
-        comment,
-        userId: req.body.userId,
-        username: req.body.username,
-        questionId: questId,
+router.get('/:qid/answers/:aid/comments', (req, res) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.status(200).json({
+        message: err,
+        success: false,
       });
     }
-    return false;
+    client.query('SELECT * FROM comments WHERE questionid = $1 AND answerid = $2',
+      [req.params.qid, req.params.aid], (error, result) => {
+        if (error) {
+          res.status(200).json({
+            message: 'An internal error occurred. Refresh page and retry',
+            success: false,
+          });
+        } else {
+          res.status(200).json({
+            success: true,
+            message: 'Comments retrieved successfully',
+            comments: result.rows,
+          });
+        }
+      });
+    done();
   });
-  res.json(answers);
+});
+
+router.post('/:qid/answers/:aid/comments', verifyToken, (req, res) => {
+  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error, userData) => {
+    if (error) {
+      res.status(401).json({
+        success: false,
+        message: 'An error occured while verifying token',
+      });
+    } else {
+      const { comment } = req.body;
+      if (!comment) {
+        return res.status(400).json({
+          success: false,
+          message: 'Comment must not be empty',
+        });
+      }
+      pool.connect((err, client, done) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: err,
+          });
+        }
+        client.query('INSERT INTO comments(answerid, questionid, username, comment) VALUES($1, $2, $3, $4)',
+        [req.params.aid, req.params.qid, userData.authUser.username, comment], (err) => {
+          if (err) {
+            res.status(500).json({
+              success: false,
+              message: err,
+            });
+          } else {
+            return res.status(500).json({
+              success: true,
+              message: 'Comment Inserted',
+            });
+          }
+        });
+        done();
+      });
+    }
+  });
 });
 
 export default router;
