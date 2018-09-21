@@ -507,7 +507,7 @@ router.post('/:qid/answers/:aid/comments', verifyToken, (req, res) => {
               message: err,
             });
           } else {
-            return res.status(500).json({
+            return res.status(201).json({
               success: true,
               message: 'Comment Inserted',
             });
