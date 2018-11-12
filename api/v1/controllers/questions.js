@@ -31,90 +31,72 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-router.get('/', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
-    if (error) {
-      res.status(417).json({
+router.get('/', (req, res) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      return res.status(200).json({
         success: false,
-        message: 'An error occured while verifying token',
+        message: err,
       });
-    } else {
+    }
+    client.query('SELECT * FROM questions', (bugFound, result) => {
+      res.status(200).json({
+        success: true,
+        message: 'All questions retrieved',
+        questions: result.rows,
+      });
+    });
+    done();
+  });
+});
+
+router.get('/:id', (req, res) => {
+    let { id } = req.params;
+    id = id.replace(/[^0-9]+/, '');
+    id = Number(id);
+    if (id) {
       pool.connect((err, client, done) => {
         if (err) {
-          return res.status(200).json({
+          return res.status(500).json({
             success: false,
             message: err,
           });
         }
-        client.query('SELECT * FROM questions', (bugFound, result) => {
-          res.status(200).json({
-            success: true,
-            message: 'All questions retrieved',
-            questions: result.rows,
-          });
+        client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
+          if (!result || result.rows.length === 0) {
+            res.status(200).json({
+              message: 'This question id does not exist in the database',
+              success: false,
+            });
+          } else {
+            client.query('SELECT * FROM answers WHERE questionid=$1 ORDER BY answerid ASC', [id], (errForAns, answers) => {
+              if (!answers || answers.rows.length === 0) {
+                res.status(200).json({
+                  message: 'Specified question retrieved',
+                  success: true,
+                  data: result.rows,
+                });
+              } else {
+                res.status(200).json({
+                  msg: 'Specified question retrieved',
+                  success: true,
+                  data: {
+                    question: result.rows,
+                    answers: answers.rows,
+                  },
+                });
+              }
+            });
+          }
         });
         done();
       });
-    }
-  });
-});
-
-router.get('/:id', verifyToken, (req, res) => {
-  jwt.verify(req.token, process.env.JWT_SECRET_KEY, (error) => {
-    if (error) {
-      res.status(401).json({
-        success: false,
-        message: 'An error occured while verifying token',
-      });
     } else {
-      let { id } = req.params;
-      id = id.replace(/[^0-9]+/, '');
-      id = Number(id);
-      if (id) {
-        pool.connect((err, client, done) => {
-          if (err) {
-            return res.status(500).json({
-              success: false,
-              message: err,
-            });
-          }
-          client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
-            if (!result || result.rows.length === 0) {
-              res.status(200).json({
-                message: 'This question id does not exist in the database',
-                success: false,
-              });
-            } else {
-              client.query('SELECT * FROM answers WHERE questionid=$1 ORDER BY answerid ASC', [id], (errForAns, answers) => {
-                if (!answers || answers.rows.length === 0) {
-                  res.status(200).json({
-                    message: 'Specified question retrieved',
-                    success: true,
-                    data: result.rows,
-                  });
-                } else {
-                  res.status(200).json({
-                    msg: 'Specified question retrieved',
-                    success: true,
-                    data: {
-                      question: result.rows,
-                      answers: answers.rows,
-                    },
-                  });
-                }
-              });
-            }
-          });
-          done();
-        });
-      } else {
-        res.status(400).json({
-          success: false,
-          message: 'Id must be a number',
-        });
-      }
+      res.status(400).json({
+        success: false,
+        message: 'Id must be a number',
+      });
     }
-  });
 });
 
 router.post('/findQuestion', (req, res) => {
@@ -427,7 +409,6 @@ router.get('/user/answered', verifyToken, (req, res) => {
       });
     }
   });
-
 });
 
 router.get('/stack/topquestion', (req, res) => {

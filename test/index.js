@@ -149,18 +149,6 @@ describe('API URL VERSION 1 Endpoints TESTS', () => {
       .expect(200)
       .end(done);
   });
-  it('it should return a forbidden status when accessing questions without auth', (done) => {
-    request(server)
-    .get('/api/v1/questions')
-    .expect(401)
-    .end(done);
-  });
-  it('it should return a forbidden status in trying to get specific question', (done) => {
-    request(server)
-    .get('/api/v1/questions/2')
-    .expect(401)
-    .end(done);
-  });
   it('it should return a forbidden status', (done) => {
     request(server)
     .get('/api/v1/auth/users')
