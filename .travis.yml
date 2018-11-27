@@ -10,7 +10,6 @@ notifications:
 before_script:
   - npm install -g codeclimate-test-reporter
   - npm install -g coveralls
-  - npm install -g sequelize
   - yarn global add nyc
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter

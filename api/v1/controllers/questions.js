@@ -427,6 +427,7 @@ router.get('/stack/topquestion', (req, res) => {
     res.status(200).json({
       success: false,
       message: 'An error occured',
+      error,
     });
   });
 });

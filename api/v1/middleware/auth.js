@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
   } else {
     res.status(401).json({
       success: false,
-      message: 'Recipe does not exist',
+      message: 'Unauthorized',
     });
   }
 };
