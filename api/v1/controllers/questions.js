@@ -55,41 +55,27 @@ router.get('/:id', (req, res) => {
     id = id.replace(/[^0-9]+/, '');
     id = Number(id);
     if (id) {
-      pool.connect((err, client, done) => {
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            message: err,
-          });
-        }
-        client.query('SELECT * FROM questions WHERE questionid=$1', [id], (error, result) => {
-          if (!result || result.rows.length === 0) {
-            res.status(200).json({
-              message: 'This question id does not exist in the database',
-              success: false,
-            });
-          } else {
-            client.query('SELECT * FROM answers WHERE questionid=$1 ORDER BY answerid ASC', [id], (errForAns, answers) => {
-              if (!answers || answers.rows.length === 0) {
-                res.status(200).json({
-                  message: 'Specified question retrieved',
-                  success: true,
-                  data: result.rows,
-                });
-              } else {
-                res.status(200).json({
-                  msg: 'Specified question retrieved',
-                  success: true,
-                  data: {
-                    question: result.rows,
-                    answers: answers.rows,
-                  },
-                });
-              }
-            });
-          }
+      pool.connect()
+      .then(async (client) => {
+        const result = await client.query('SELECT * FROM questions WHERE questionid=$1', [id]);
+        const answers = await client.query('SELECT * FROM answers WHERE questionid=$1 ORDER BY answerid ASC', [id]);
+        const comments = await client.query('SELECT * FROM comments WHERE questionid=$1', [id]);
+        return res.status(200).json({
+          msg: 'Specified question retrieved',
+          success: true,
+          data: {
+            question: result.rows,
+            answers: answers.rows,
+            comments: comments.rows,
+          },
         });
-        done();
+      })
+      .catch((error) => {
+        res.status(200).json({
+          success: false,
+          message: 'An error occured',
+          error,
+        });
       });
     } else {
       res.status(400).json({
@@ -142,11 +128,12 @@ router.post('/', verifyToken, (req, res) => {
               message: err,
             });
           }
-          client.query('INSERT INTO questions(userid, username, question, title) VALUES($1, $2, $3, $4)', [
+          client.query('INSERT INTO questions(userid, username, question, title, createdat) VALUES($1, $2, $3, $4, $5)', [
             Number(userData.authUser.userid),
             userData.authUser.username,
             req.body.question,
             req.body.title,
+            'now',
           ]);
           done();
           res.status(201).json({
@@ -180,7 +167,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
               message: err,
             });
           }
-          client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes) VALUES($1, $2, $3, $4, $5, $6, $7)', [
+          client.query('INSERT INTO answers(questionid, userid, username, answer, state, upvotes, downvotes, createdat) VALUES($1, $2, $3, $4, $5, $6, $7, $8)', [
             req.params.id,
             userData.authUser.userid,
             userData.authUser.username,
@@ -188,6 +175,7 @@ router.post('/:id/answers', verifyToken, (req, res) => {
             0,
             0,
             0,
+            'now',
           ]);
           done();
           res.status(201).json({
@@ -230,6 +218,7 @@ router.delete('/:id', verifyToken, (req, res) => {
             });
           } else {
             client.query('DELETE FROM questions WHERE questionid=$1', [questId]);
+            client.query('DELETE FROM answers WHERE questionid=$1', [questId]);
             res.status(200).json({
               success: true,
               message: 'Question deleted',
@@ -481,8 +470,14 @@ router.post('/:qid/answers/:aid/comments', verifyToken, (req, res) => {
             message: err,
           });
         }
-        client.query('INSERT INTO comments(answerid, questionid, username, comment) VALUES($1, $2, $3, $4)',
-        [req.params.aid, req.params.qid, userData.authUser.username, comment], (err) => {
+        client.query('INSERT INTO comments(answerid, questionid, username, comment, createdat) VALUES($1, $2, $3, $4, $5)',
+        [
+          req.params.aid,
+          req.params.qid,
+          userData.authUser.username,
+          comment,
+          'now',
+        ], (err) => {
           if (err) {
             res.status(500).json({
               success: false,
