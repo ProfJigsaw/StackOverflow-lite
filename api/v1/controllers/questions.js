@@ -1,14 +1,10 @@
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import pg from 'pg';
-import dbpackage from '../model/dbstruct';
-import generateUniqueId from '../helpers/genUniqueId';
-import mode from '../helpers/mode';
 
 require('dotenv').config();
 
 const router = express.Router();
-const { questions, answers } = dbpackage;
 const pool = new pg.Pool({
   host: process.env.POSTGRES_AWS_HOST,
   user: process.env.POSTGRES_USER,
